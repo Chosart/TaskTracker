@@ -24,6 +24,8 @@ namespace TaskTracker.Models
         /// Хешує пароль і зберігає його як хеш
         /// </summary>
         /// <param name="password">Пароль для хешування</param>
+
+        public ICollection<TrackedTask> Tasks { get; set; }
         public void SetPassword(string password)
         {
             using (var sha256 = SHA256.Create())

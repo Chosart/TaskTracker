@@ -2,7 +2,7 @@
 
 namespace TaskTracker.Models
 {
-    public class Task
+    public class TrackedTask
     {
         public int Id { get; set; }
         public string Title { get; set; }
