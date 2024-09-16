@@ -11,5 +11,9 @@ namespace TaskTracker.Models
         public string Priority { get; set; }
         public DataType CreatedAt { get; set; }
         public DateTime? CompletedAt { get; set; }
+
+        //Foregiven key
+        public int UserId { get; set; }
+        public User User { get; set; }
     }
 }
