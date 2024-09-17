@@ -1,6 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using TaskTracker.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<TaskTrackerContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("TaskTrackerContext")));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -18,7 +18,7 @@ namespace TaskTracker.Data
             modelBuilder.Entity<TrackedTask>()
                 .HasOne(t => t.User)
                 .WithMany(u => u.Tasks)
-                .HasForeignKey(t => t.User);
+                .HasForeignKey(t => t.UserId);
         }
     }
 }
