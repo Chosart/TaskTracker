@@ -11,7 +11,7 @@ namespace TaskTracker.Data
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<TrackedTask> TrackedTasks { get; set; }
+        public DbSet<Models.TrackedTask> TrackedTasks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
