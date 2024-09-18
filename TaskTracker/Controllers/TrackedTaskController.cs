@@ -34,5 +34,25 @@ namespace TaskTracker.Controllers
             }
             return Ok(trackedTask);
         }
+
+        [HttpPost]
+        public async Task<ActionResult<TrackedTask>> CreateTrakedTask([FromBody] TrackedTask trackedTask)
+        {
+            if(trackedTask == null)
+            {
+                return BadRequest("Contact cannot be null.");
+            }
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            
+            _context.TrackedTasks.Add(trackedTask);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetTrackedTaskById), new { id  = trackedTask.Id }, trackedTask);
+
+        }
     }
 }
