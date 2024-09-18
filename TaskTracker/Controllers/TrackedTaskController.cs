@@ -27,8 +27,7 @@ namespace TaskTracker.Controllers
         public async Task<ActionResult<TrackedTask>> GetTrackedTaskById(int id)
         {
             var trackedTask = await _context.TrackedTasks.FindAsync(id);
-
-            if( trackedTask == null)
+            if (trackedTask == null)
             {
                 return NotFound();
             }
@@ -36,35 +35,34 @@ namespace TaskTracker.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<TrackedTask>> CreateTrakedTask([FromBody] TrackedTask trackedTask)
+        public async Task<ActionResult<TrackedTask>> CreateTrackedTask([FromBody] TrackedTask trackedTask)
         {
-            if(trackedTask == null)
+            if (trackedTask == null)
             {
-                return BadRequest("Contact cannot be null.");
+                return BadRequest("Task cannot be null.");
             }
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            
+
             _context.TrackedTasks.Add(trackedTask);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetTrackedTaskById), new { id  = trackedTask.Id }, trackedTask);
-
+            return CreatedAtAction(nameof(GetTrackedTaskById), new { id = trackedTask.Id }, trackedTask);
         }
 
         [HttpPut("{id}")]
-        public async Task <ActionResult> UpdateTrackedTask(int id, TrackedTask trackedTask)
+        public async Task<ActionResult> UpdateTrackedTask(int id, TrackedTask trackedTask)
         {
-            if(id != trackedTask.Id)
+            if (id != trackedTask.Id)
             {
                 return BadRequest("ID in the URL does not match the task ID.");
             }
 
             var existingTask = await _context.TrackedTasks.FindAsync(id);
-            if(existingTask == null)
+            if (existingTask == null)
             {
                 return NotFound("Task not found.");
             }
@@ -82,10 +80,30 @@ namespace TaskTracker.Controllers
                 {
                     return NotFound("Task not found.");
                 }
-                else
-                {
-                    throw;
-                }
+                throw; // Якщо існує помилка, залишаємо без змін
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteTrackedTask(int id)
+        {
+            var trackedTask = await _context.TrackedTasks.FindAsync(id);
+            if (trackedTask == null)
+            {
+                return NotFound("Task not found.");
+            }
+
+            _context.TrackedTasks.Remove(trackedTask);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                return StatusCode(500, "Internal server error.");
             }
 
             return NoContent();
