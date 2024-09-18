@@ -18,21 +18,21 @@ namespace TaskTracker.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<TrackedTask>> GetTrackedTasks()
+        public async Task<ActionResult<IEnumerable<TrackedTask>>> GetTrackedTasks()
         {
             return await _context.TrackedTasks.ToListAsync();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<TrackedTask>>> GetTrackedTasks(int id)
+        public async Task<ActionResult<TrackedTask>> GetTrackedTaskById(int id)
         {
-            var trackedTasks = await _context.TrackedTasks.FindAsync(id);
+            var trackedTask = await _context.TrackedTasks.FindAsync(id);
 
-            if( trackedTasks == null)
+            if( trackedTask == null)
             {
                 return NotFound();
             }
-            return Ok(trackedTasks);
+            return Ok(trackedTask);
         }
     }
 }
