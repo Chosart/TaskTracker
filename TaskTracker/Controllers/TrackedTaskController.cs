@@ -54,5 +54,46 @@ namespace TaskTracker.Controllers
             return CreatedAtAction(nameof(GetTrackedTaskById), new { id  = trackedTask.Id }, trackedTask);
 
         }
+
+        [HttpPut("{id}")]
+        public async Task <ActionResult> UpdateTrackedTask(int id, TrackedTask trackedTask)
+        {
+            if(id != trackedTask.Id)
+            {
+                return BadRequest("ID in the URL does not match the task ID.");
+            }
+
+            var existingTask = await _context.TrackedTasks.FindAsync(id);
+            if(existingTask == null)
+            {
+                return NotFound("Task not found.");
+            }
+
+            existingTask.Title = trackedTask.Title;
+            existingTask.Description = trackedTask.Description;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!trackedTaskExists(id))
+                {
+                    return NotFound("Task not found.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        private bool trackedTaskExists(int id)
+        {
+            return _context.TrackedTasks.Any(e => e.Id == id);
+        }
     }
 }
