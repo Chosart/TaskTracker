@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace TaskTracker.Models
 {
@@ -25,6 +26,7 @@ namespace TaskTracker.Models
         /// </summary>
         /// <param name="password">Пароль для хешування</param>
 
+        [JsonIgnore] // Запобігаємо циклічній серіалізації
         public ICollection<TrackedTask> Tasks { get; set; }
 
         public void SetPassword(string password)
