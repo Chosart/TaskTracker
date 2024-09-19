@@ -55,7 +55,7 @@ namespace TaskTracker.Controllers
             return CreatedAtAction(nameof(GetUser), new {id = user.Id}, user);
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<ActionResult<User>> UpdateUser (int id, User user)
         {
             if (id != user.Id)
@@ -84,6 +84,29 @@ namespace TaskTracker.Controllers
                     return NotFound("Task not found.");
                 }
                 throw;
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<User>> DeleteUser(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound("Task not found.");
+            }
+
+            _context.Users.Remove(user);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                return StatusCode(500, "Internal server error.");
             }
 
             return NoContent();
