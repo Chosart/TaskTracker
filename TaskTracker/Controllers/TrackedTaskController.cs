@@ -54,7 +54,7 @@ namespace TaskTracker.Controllers
                 Description = taskDto.Description,
                 IsCompleted = taskDto.IsCompleted,
                 Priority = taskDto.Priority,
-                CreatedAt = taskDto.CreatedAt,
+                CreatedAt = (int)(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
                 UserId = taskDto.UserId
             };
 
