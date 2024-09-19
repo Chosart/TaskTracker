@@ -35,5 +35,24 @@ namespace TaskTracker.Controllers
 
             return Ok(user);
         }
+
+        [HttpPost]
+        public async Task<ActionResult<User>> CreateUser([FromBody] User user)
+        {
+            if (user == null)
+            {
+                return BadRequest("User cannot be null.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetUser), new {id = user.Id}, user);
+        }
     }
 }
