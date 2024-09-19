@@ -16,5 +16,11 @@ namespace TaskTracker.Controllers
         {
             _context = context;
         }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        {
+            return await _context.Users.ToListAsync();
+        }
     }
 }
