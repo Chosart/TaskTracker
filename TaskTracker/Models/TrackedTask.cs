@@ -19,7 +19,7 @@ namespace TaskTracker.Models
         public string Priority { get; set; }
 
         [Required]
-        public DateTime CreatedAt { get; set; }
+        public int CreatedAt { get; set; }
 
         public DateTime? CompletedAt { get; set; }
 
