@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskTracker.Data;
 using TaskTracker.Models;
 using Microsoft.EntityFrameworkCore;
+using TaskTracker.DTO;
 
 namespace TaskTracker.Controllers
 {
@@ -35,9 +36,9 @@ namespace TaskTracker.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<TrackedTask>> CreateTrackedTask([FromBody] TrackedTask trackedTask)
+        public async Task<ActionResult<TrackedTask>> CreateTrackedTask([FromBody] CreateTrackedTaskDto taskDto)
         {
-            if (trackedTask == null)
+            if (taskDto == null)
             {
                 return BadRequest("Task cannot be null.");
             }
@@ -47,7 +48,17 @@ namespace TaskTracker.Controllers
                 return BadRequest(ModelState);
             }
 
-            _context.TrackedTasks.Add(trackedTask);
+            var trackedTask = new TrackedTask
+            {
+                Title = taskDto.Title,
+                Description = taskDto.Description,
+                IsCompleted = taskDto.IsCompleted,
+                Priority = taskDto.Priority,
+                CreatedAt = taskDto.CreatedAt,
+                UserId = taskDto.UserId
+            };
+
+            await _context.TrackedTasks.AddAsync(trackedTask);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetTrackedTaskById), new { id = trackedTask.Id }, trackedTask);

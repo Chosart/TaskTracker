@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TaskTracker.Models
+namespace TaskTracker.DTO
 {
-    public class TrackedTask
+    public class CreateTrackedTaskDto
     {
-        public int Id { get; set; }
-
         [Required]
         public string Title { get; set; }
 
@@ -21,11 +19,7 @@ namespace TaskTracker.Models
         [Required]
         public DateTime CreatedAt { get; set; }
 
-        public DateTime? CompletedAt { get; set; }
-
         [Required]
         public int UserId { get; set; }
-
-        public User User { get; set; }
     }
 }
