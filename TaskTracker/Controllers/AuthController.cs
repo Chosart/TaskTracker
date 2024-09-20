@@ -56,6 +56,8 @@ namespace TaskTracker.Controllers
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
+
+
         [HttpGet("{id}", Name = "GetUser")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
