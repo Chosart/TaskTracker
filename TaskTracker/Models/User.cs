@@ -29,11 +29,15 @@ namespace TaskTracker.Models
         [JsonIgnore] // Запобігаємо циклічній серіалізації
         public ICollection<TrackedTask> Tasks { get; set; }
 
+        public string Salt { get; set; }
+
         public void SetPassword(string password)
         {
+            Salt = Guid.NewGuid().ToString();
+
             using (var sha256 = SHA256.Create())
             {
-                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password + Salt));
                 PasswordHash = Convert.ToBase64String(bytes);
             }
         }
@@ -45,9 +49,9 @@ namespace TaskTracker.Models
         /// <returns>Повертає true, якщо паролі співпадають, інакше false</returns>
         public bool ValidatePassword(string password)
         {
-            using(var sha256 = SHA256.Create())
+            using (var sha256 = SHA256.Create())
             {
-                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password + Salt));
                 var hash = Convert.ToBase64String(bytes);
                 return hash == PasswordHash;
             }
