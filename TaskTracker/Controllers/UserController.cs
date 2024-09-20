@@ -27,12 +27,10 @@ namespace TaskTracker.Controllers
         public async Task<ActionResult<User>> GetUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
-
             if (user == null)
             {
-                return NotFound();
+                return NotFound("User not found.");
             }
-
             return Ok(user);
         }
 
@@ -49,20 +47,21 @@ namespace TaskTracker.Controllers
                 return BadRequest(ModelState);
             }
 
+            user.SetPassword(user.PasswordHash); // Хешуємо пароль
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetUser), new {id = user.Id}, user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<User>> UpdateUser (int id, User user)
+        public async Task<ActionResult> UpdateUser(int id, User user)
         {
             if (id != user.Id)
             {
                 return BadRequest("ID in the URL does not match the user ID.");
             }
-           
+
             var existingUser = await _context.Users.FindAsync(id);
             if (existingUser == null)
             {
@@ -71,7 +70,12 @@ namespace TaskTracker.Controllers
 
             existingUser.UserName = user.UserName;
             existingUser.Email = user.Email;
-            existingUser.PasswordHash = user.PasswordHash;
+
+            // Хешуємо пароль лише якщо він оновлюється
+            if (!string.IsNullOrEmpty(user.PasswordHash))
+            {
+                existingUser.SetPassword(user.PasswordHash);
+            }
 
             try
             {
@@ -79,9 +83,9 @@ namespace TaskTracker.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if(!UserExists(id))
+                if (!UserExists(id))
                 {
-                    return NotFound("Task not found.");
+                    return NotFound("User not found.");
                 }
                 throw;
             }
@@ -90,12 +94,12 @@ namespace TaskTracker.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<User>> DeleteUser(int id)
+        public async Task<ActionResult> DeleteUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
-                return NotFound("Task not found.");
+                return NotFound("User not found.");
             }
 
             _context.Users.Remove(user);
