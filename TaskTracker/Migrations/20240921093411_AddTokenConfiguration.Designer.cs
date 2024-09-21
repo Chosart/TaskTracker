@@ -12,8 +12,8 @@ using TaskTracker.Data;
 namespace TaskTracker.Migrations
 {
     [DbContext(typeof(TaskTrackerContext))]
-    [Migration("20240921092435_UpdateJwtTokenKey")]
-    partial class UpdateJwtTokenKey
+    [Migration("20240921093411_AddTokenConfiguration")]
+    partial class AddTokenConfiguration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
