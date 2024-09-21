@@ -90,7 +90,11 @@ namespace TaskTracker.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            int tokenExpiration = int.Parse(_configuration["AppSettings:TokenExpiration"]);
+            var tokenExpirationString = _configuration["AppSettings:TokenExpiration"];
+            if (!int.TryParse(tokenExpirationString, out int tokenExpiration))
+            {
+                tokenExpiration = 30;
+            }
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["AppSettings:Issuer"],
