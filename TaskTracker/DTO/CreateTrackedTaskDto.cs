@@ -17,7 +17,7 @@ namespace TaskTracker.DTO
         public string Priority { get; set; }
 
         [Required]
-        public DateTime CreatedAt { get; set; }
+        public int CreatedAt { get; set; }
 
         [Required]
         public int UserId { get; set; }
