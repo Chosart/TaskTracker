@@ -46,17 +46,25 @@ namespace TaskTracker.Tests
                 Password = "Password123"
             };
 
+            var existingUser = new User
+            {
+                UserName = "existingUser",
+                Email = "existing@example.com"
+            };
+
             // Додаємо існуючого користувача в базу даних
-            _context.Users.Add(new User { UserName = registerDto.UserName, Email = registerDto.Email });
+            existingUser.SetPassword("Password123"); // Хешуємо пароль
+            _context.Users.Add(existingUser);
             await _context.SaveChangesAsync();
 
             var result = await _controller.Register(registerDto);
 
             var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
-            var errorResponse = actionResult.Value as dynamic;
+            var errorResponse = Assert.IsType<ErrorResponse>(actionResult.Value);
 
             Assert.NotNull(errorResponse);
-            Assert.Equal("UserName is already taken.", errorResponse.message);
+            // Перевірка правильності повідомлення
+            Assert.Equal("UserName is already taken.", errorResponse.Message);
         }
 
         [Fact]
@@ -65,16 +73,16 @@ namespace TaskTracker.Tests
             var loginDto = new LoginDto
             {
                 UserName = "nonExistentUser",
-                Password = "Password123"
+                Password = "SomePassword"
             };
 
             var result = await _controller.Login(loginDto);
 
-            var actionresult = Assert.IsType<UnauthorizedObjectResult>(result.Result);
-            var errorResponse = actionresult.Value as dynamic;
+            var actionResult = Assert.IsType<UnauthorizedObjectResult>(result.Result);
+            var errorResponse = Assert.IsType<ErrorResponse>(actionResult.Value);
 
             Assert.NotNull(errorResponse);
-            Assert.Equal("Invalid username or password.", errorResponse.message);
+            Assert.Equal("Invalid username or password.", errorResponse.Message);
         }
     }
 }

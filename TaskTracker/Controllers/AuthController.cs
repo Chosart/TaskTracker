@@ -29,13 +29,13 @@ namespace TaskTracker.Controllers
         public async Task<ActionResult<User>> Register([FromBody] RegisterDto registerDto)
         {
             if (registerDto == null)
-                return BadRequest(new { message = "User data is required." });
+                return BadRequest(new ErrorResponse("User data is required."));
 
             if (await _context.Users.AnyAsync(u => u.UserName == registerDto.UserName))
-                return BadRequest(new { message = "UserName is already taken." });
+                return BadRequest(new ErrorResponse("UserName is already taken."));
 
             if (await _context.Users.AnyAsync(u => u.Email == registerDto.Email))
-                return BadRequest(new { message = "Email is already in use." });
+                return BadRequest(new ErrorResponse("Email is already in use."));
 
             var user = new User
             {
@@ -52,7 +52,7 @@ namespace TaskTracker.Controllers
             }
             catch (DbUpdateException)
             {
-                return StatusCode(500, new { message = "Internal server error while saving user." });
+                return StatusCode(500, new ErrorResponse("Internal server error while saving user."));
             }
 
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
@@ -63,14 +63,14 @@ namespace TaskTracker.Controllers
         {
             if (loginDto == null)
             {
-                return BadRequest(new { message = "User data is required." });
+                return BadRequest(new ErrorResponse("User data is required."));
             }
 
             var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == loginDto.UserName);
 
             if (user == null || !user.ValidatePassword(loginDto.Password))
             {
-                return Unauthorized(new { message = "Invalid username or password." });
+                return Unauthorized(new ErrorResponse("Invalid username or password."));
             }
 
             var token = GenerateJwtToken(user);
