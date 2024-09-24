@@ -47,7 +47,7 @@ namespace TaskTracker.Tests
             };
 
             // Додаємо існуючого користувача в базу даних
-            _context.Users.Add(new User { UserName = "existingUser", Email = "existing@example.com" });
+            _context.Users.Add(new User { UserName = registerDto.UserName, Email = registerDto.Email });
             await _context.SaveChangesAsync();
 
             var result = await _controller.Register(registerDto);
@@ -57,6 +57,24 @@ namespace TaskTracker.Tests
 
             Assert.NotNull(errorResponse);
             Assert.Equal("UserName is already taken.", errorResponse.message);
+        }
+
+        [Fact]
+        public async Task Login_UserNotFound_ReturnsUnauthorized()
+        {
+            var loginDto = new LoginDto
+            {
+                UserName = "nonExistentUser",
+                Password = "Password123"
+            };
+
+            var result = await _controller.Login(loginDto);
+
+            var actionresult = Assert.IsType<UnauthorizedObjectResult>(result.Result);
+            var errorResponse = actionresult.Value as dynamic;
+
+            Assert.NotNull(errorResponse);
+            Assert.Equal("Invalid username or password.", errorResponse.message);
         }
     }
 }
