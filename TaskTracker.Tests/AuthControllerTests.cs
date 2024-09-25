@@ -116,6 +116,49 @@ namespace TaskTracker.Tests
         }
 
         [Fact]
+        public async Task UpdateTrackedTask_ValidTask_ReturnOk()
+        {
+            // Створюємо трековану задачу
+            var trackedTask = new TrackedTask
+            {
+                Title = "Original Title",
+                Description = "Original Description",
+                IsCompleted = false,
+                Priority = "High",
+                CreatedAt = 1234567890,
+                UserId = 1
+            };
+
+            // Додаємо задачу в контекст
+            _context.TrackedTasks.Add(trackedTask);
+            await _context.SaveChangesAsync();
+
+            var updateTaskDto = new TrackedTaskDto
+            {
+                Title = "Update Title",
+                Description = "Update Description",
+                IsCompleted = true,
+                Priority = "Low"
+            };
+
+            // Ініціалізуємо контролер
+            var trackedTaskController = new TrackedTaskController(_context);
+
+            // Викликаємо метод оновлення
+            var result = await trackedTaskController.UpdateTrackedTask(trackedTask.Id, updateTaskDto);
+
+            // Перевіряємо, що результат - це OkResult
+            var actionResult = Assert.IsType<ActionResult<TrackedTask>>(result);
+            var updateTask = Assert.IsType<TrackedTask>(actionResult.Value);
+
+            // Перевіряємо, чи оновлені данні
+            Assert.Equal(updateTaskDto.Title, updateTask.Title);
+            Assert.Equal(updateTaskDto.Description, updateTask.Description);
+            Assert.True(updateTask.IsCompleted);
+            Assert.Equal(updateTaskDto.Priority, updateTask.Priority);
+        }
+
+        [Fact]
         public async Task GetUsers_ReturnsAllUsers()
         {
             // Створюємо користувача
