@@ -100,5 +100,34 @@ namespace TaskTracker.Tests
             Assert.True(updateTask.IsCompleted);
             Assert.Equal(updateTaskDto.Priority, updateTask.Priority);
         }
+
+        [Fact]
+        public async Task CreateTrackedTask_ValidTask_ReturnsCreatedTask()
+        {
+            // Підготовка данних для створення нової задачі
+            var createTaskDto = new CreateTrackedTaskDto
+            {
+                Title = "New Task",
+                Description = "New Description",
+                IsCompleted = false,
+                Priority = "Medium",
+                CreatedAt = (int)(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
+                UserId = 1
+            };
+
+            // Виклик методу створення задачі
+            var result = await _controller.CreateTrackedTask(createTaskDto);
+
+            // Перевірка, що результат - це CreatedAtActionResult
+            var actionResult = Assert.IsType<CreatedAtActionResult>(result.Result);
+
+            // Перевірка, що створена задача має правильні значення 
+            var createdTask = Assert.IsType<TrackedTask>(actionResult.Value);
+
+            Assert.Equal(createTaskDto.Title, createdTask.Title);
+            Assert.Equal(createTaskDto.Description, createdTask.Description);
+            Assert.False(createdTask.IsCompleted);
+            Assert.Equal(createTaskDto.Priority, createdTask.Priority);
+        }
     }
 }
