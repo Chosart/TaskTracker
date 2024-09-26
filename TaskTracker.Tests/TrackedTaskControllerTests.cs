@@ -129,5 +129,46 @@ namespace TaskTracker.Tests
             Assert.False(createdTask.IsCompleted);
             Assert.Equal(createTaskDto.Priority, createdTask.Priority);
         }
+
+        [Fact]
+        public async Task DeleteTrackedTask_ExistingId_ReturnsNoContent()
+        {
+            // Створення трекової задачі для видалення
+            var trackedTask = new TrackedTask
+            {
+                Title = "Task to Delete",
+                Description = "Description",
+                IsCompleted = false,
+                Priority = "Low",
+                CreatedAt = (int)(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
+                UserId = 1
+            };
+
+            // Створюємо задачу в контекст
+            _context.TrackedTasks.Add(trackedTask);
+            await _context.SaveChangesAsync();
+
+            // Виклик методу видалення задачі
+            var result = await _controller.DeleteTrackedTask(trackedTask.Id);
+
+            // Перевірка, що результат - це NoContentResult
+            Assert.IsType<NoContentResult>(result);
+
+            // Перевірка, що задача була видалена з бази
+            Assert.Null(await _context.TrackedTasks.FindAsync(trackedTask.Id));
+        }
+
+        [Fact]
+        public async Task DeleteTrackedTask_NonExistingId_ReturnsNotFound()
+        {
+            // Виклик методу видалення для неіснуючого ID
+            var result = await _controller.DeleteTrackedTask(999); // Невірний ID
+
+            // Перевірка, що результат - це NotFoundObjectResult
+            var actionResult = Assert.IsType<NotFoundObjectResult>(result);
+
+            // Перевірка повідомлення про помилку
+            Assert.Equal("Task not found.", actionResult.Value);
+        }
     }
 }
