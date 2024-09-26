@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace TaskTracker.Tests
 {
-    public class AuthControllerTests
+    public class AuthControllerTests 
     {
         private readonly AuthController _controller;
         private readonly TaskTrackerContext _context;
