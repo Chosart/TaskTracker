@@ -76,29 +76,34 @@ namespace TaskTracker.Tests
             _context.TrackedTasks.Add(trackedTask);
             await _context.SaveChangesAsync();
 
-            var updateTaskDto = new TrackedTaskDto
+            // Створюємо об'єкт для оновлення з новими даними
+            var updatedTask = new TrackedTask
             {
+                Id = trackedTask.Id, // Вказуємо правильний ID
                 Title = "Update Title",
                 Description = "Update Description",
                 IsCompleted = true,
-                Priority = "Low"
+                Priority = "Low",
+                CreatedAt = trackedTask.CreatedAt, // Залишаємо ту ж саму дату створення
+                UserId = trackedTask.UserId // Залишаємо того ж користувача
             };
 
             // Ініціалізуємо контролер
             var trackedTaskController = new TrackedTaskController(_context);
 
             // Викликаємо метод оновлення
-            var result = await trackedTaskController.UpdateTrackedTask(trackedTask.Id, updateTaskDto);
+            var result = await trackedTaskController.UpdateTrackedTask(trackedTask.Id, updatedTask);
 
-            // Перевіряємо, що результат - це OkResult
-            var actionResult = Assert.IsType<ActionResult<TrackedTask>>(result);
-            var updateTask = Assert.IsType<TrackedTask>(actionResult.Value);
+            // Перевіряємо, що результат - це NoContentResult
+            var actionResult = Assert.IsType<NoContentResult>(result);
 
             // Перевіряємо, чи оновлені данні
-            Assert.Equal(updateTaskDto.Title, updateTask.Title);
-            Assert.Equal(updateTaskDto.Description, updateTask.Description);
-            Assert.True(updateTask.IsCompleted);
-            Assert.Equal(updateTaskDto.Priority, updateTask.Priority);
+            var updatedEntity = await _context.TrackedTasks.FindAsync(trackedTask.Id);
+            Assert.NotNull(updatedEntity); // Переконуємось, що задача існує
+            Assert.Equal(updatedTask.Title, updatedEntity.Title);
+            Assert.Equal(updatedTask.Description, updatedEntity.Description);
+            Assert.True(updatedEntity.IsCompleted);
+            Assert.Equal(updatedTask.Priority, updatedEntity.Priority);
         }
 
         [Fact]
