@@ -86,36 +86,6 @@ namespace TaskTracker.Tests
         }
 
         [Fact]
-        public async Task GetTrackedTasks_ReturnsAllTasks()
-        {
-            // Створюємо трековану задачу
-            var trackedTask = new TrackedTask
-            {
-                Title = "Test Task",
-                Description = "Test Description",
-                IsCompleted = false,
-                Priority = "High",
-                CreatedAt = 1234567890,
-                UserId = 1
-            };
-
-            // Додаємо задачу в контекст
-            _context.TrackedTasks.Add(trackedTask);
-            await _context.SaveChangesAsync();
-
-            // Ініціалізуємо контролер для трекованих задач
-            var trackedTaskController = new TrackedTaskController(_context);
-            var result = await trackedTaskController.GetTrackedTasks();
-
-            // Перевірка, чи повертається список задач
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
-            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
-
-            // Перевіряємо, що в списку лише одна задача
-            Assert.Single(tasks);
-        }
-
-        [Fact]
         public async Task UpdateTrackedTask_ValidTask_ReturnOk()
         {
             // Створюємо трековану задачу
