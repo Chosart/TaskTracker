@@ -139,5 +139,27 @@ namespace TaskTracker.Tests
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
             Assert.Equal("User not found.", notFoundResult.Value);
         }
+
+        [Fact]
+        public async Task DeleteUser_ExistingUser_ReturnsNoContent()
+        {
+            // Act
+            var result = await _controller.DeleteUser(1);
+
+            // Assert
+            Assert.IsType<NoContentResult>(result);
+            Assert.Null(await _context.Users.FindAsync(1)); // Перевіряємо, що користувача більше немає
+        }
+
+        [Fact]
+        public async Task DeleteUser_NonExistingUser_ReturnsNotFound()
+        {
+            // Act
+            var result = await _controller.DeleteUser(999);
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal("User not found.", notFoundResult.Value);
+        }
     }
 }
