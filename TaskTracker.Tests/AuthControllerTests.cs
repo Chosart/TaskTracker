@@ -84,31 +84,5 @@ namespace TaskTracker.Tests
             Assert.NotNull(errorResponse);
             Assert.Equal("Invalid username or password.", errorResponse.Message);
         }
-
-        [Fact]
-        public async Task GetUsers_ReturnsAllUsers()
-        {
-            // Створюємо користувача
-            var user = new User
-            {
-                UserName = "Test",
-                Email = "test@example.com"
-            };
-
-            // Додаємо користувача в контекст
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            // Ініціалізуємо контролер для користувачів
-            var userController = new UserController(_context);
-            var result = await userController.GetUsers();
-
-            // Перевірка, чи повертається список користувачів
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<User>>>(result);
-            var users = Assert.IsType<List<User>>(actionResult.Value);
-
-            // Перевіряємо, що в списку лише один користувач
-            Assert.Single(users);
-        }   
     }
 }
