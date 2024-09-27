@@ -102,6 +102,42 @@ namespace TaskTracker.Tests
             Assert.Equal("User cannot be null.", badRequestResult.Value);
         }
 
+        [Fact]
+        public async Task UpdateUser_ExistingUser_ReturnsNoContent()
+        {
+            // Arrange
+            var updatedUser = new User
+            {
+                Id = 1,
+                UserName = "UpdatedUser1",
+                Email = "updated1@gmail.com"
+            };
 
+            // Act
+            var result = await _controller.UpdateUser(updatedUser.Id, updatedUser);
+
+            // Assert
+            Assert.IsType<NoContentResult>(result);
+            var user = await _context.Users.FindAsync(1);
+            Assert.Equal("UpdatedUser1", user.UserName);
+        }
+
+        [Fact]
+        public async Task UpdateUser_NonExistingUser_ReturnsNotFound()
+        {
+            // Arrange
+            var updateUser = new User
+            {
+                Id = 999,
+                UserName = "NonExistentUser"
+            };
+
+            // Act
+            var result = await _controller.UpdateUser(updateUser.Id, updateUser);
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal("User not found.", notFoundResult.Value);
+        }
     }
 }
