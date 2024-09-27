@@ -36,29 +36,39 @@ namespace TaskTracker.Tests
         }
 
         [Fact]
-        public async Task GetUsers_ReturnsAllUsers()
+        public async Task GetUsers_ReturnsListOfUsers()
         {
-            // Створюємо користувача
-            var user = new User
-            {
-                UserName = "Test",
-                Email = "test@example.com"
-            };
+            // Act
+            var result = await _controller.GetUsers();
 
-            // Додаємо користувача в контекст
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            // Ініціалізуємо контролер для користувачів
-            var userController = new UserController(_context);
-            var result = await userController.GetUsers();
-
-            // Перевірка, чи повертається список користувачів
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<User>>>(result);
-            var users = Assert.IsType<List<User>>(actionResult.Value);
-
-            // Перевіряємо, що в списку лише один користувач
-            Assert.Single(users);
+            //Accert
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var returnedUsers = Assert.IsAssignableFrom<IEnumerable<User>>(okResult.Value);
+            Assert.Equal(2, returnedUsers.Count());
         }
+
+        [Fact]
+        public async Task GetUser_ReturnsUser_WhenUserExists()
+        {
+            // Act
+            var result = await _controller.GetUser(1);
+
+            //Accert
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var user = Assert.IsType<User>(okResult.Value);
+            Assert.Equal("User1", user.UserName);
+        }
+
+        [Fact]
+        public async Task GetUser_ReturnsNotFound_WhenUserDoesNotExist()
+        {
+            // Act
+            var result = await _controller.GetUser(999);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+
     }
 }
