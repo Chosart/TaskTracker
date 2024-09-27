@@ -48,27 +48,26 @@ namespace TaskTracker.Tests
         }
 
         [Fact]
-        public async Task GetUser_ReturnsUser_WhenUserExists()
+        public async Task GetUser_ExistingUser_ReturnsOkResult()
         {
             // Act
             var result = await _controller.GetUser(1);
 
-            //Accert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var user = Assert.IsType<User>(okResult.Value);
-            Assert.Equal("User1", user.UserName);
+            // Assert
+            var okResult = Assert.IsType<ActionResult<User>>(result);
+            var returnedUser = Assert.IsType<User>(okResult.Value);
+            Assert.Equal("User1", returnedUser.UserName);
         }
 
         [Fact]
-        public async Task GetUser_ReturnsNotFound_WhenUserDoesNotExist()
+        public async Task CreateUser_NonExistingUser_ReturnsNotFound()
         {
             // Act
             var result = await _controller.GetUser(999);
 
             // Assert
-            Assert.IsType<NotFoundResult>(result.Result);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
+            Assert.Equal("User not found.", notFoundResult.Value);
         }
-
-
     }
 }
