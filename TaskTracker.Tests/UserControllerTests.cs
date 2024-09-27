@@ -60,7 +60,7 @@ namespace TaskTracker.Tests
         }
 
         [Fact]
-        public async Task CreateUser_NonExistingUser_ReturnsNotFound()
+        public async Task GetUser_NonExistingUser_ReturnsNotFound()
         {
             // Act
             var result = await _controller.GetUser(999);
@@ -69,5 +69,39 @@ namespace TaskTracker.Tests
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
             Assert.Equal("User not found.", notFoundResult.Value);
         }
+
+
+        [Fact]
+        public async Task CreateUser_ValidUser_ReturnsCreatedResult()
+        {
+            // Arrange
+            var newUser = new User
+            {
+                UserName = "User3",
+                Email = "user3@gmail.com",
+                PasswordHash = "Password123"
+            };
+
+            // Act
+            var result = await _controller.CreateUser(newUser);
+
+            // Assert
+            var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
+            var createdUser = Assert.IsType<User>(createdResult.Value);
+            Assert.Equal("User3", createdUser.UserName);
+        }
+
+        [Fact]
+        public async Task CreateUser_NullUser_ReturnsBadRequest()
+        {
+            // Act
+            var resut = await _controller.CreateUser(null);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(resut.Result);
+            Assert.Equal("User cannot be null.", badRequestResult.Value);
+        }
+
+
     }
 }
