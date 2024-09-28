@@ -26,6 +26,10 @@ namespace TaskTracker.Tests
 
             _context = new TaskTrackerContext(options);
             _controller = new TrackedTaskController(_context);
+
+            // Очищення бази данних перед кожним тестом
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
         }
 
         [Fact]
@@ -55,7 +59,7 @@ namespace TaskTracker.Tests
             var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
 
             // Перевіряємо, що в списку лише одна задача
-            Assert.Single(tasks);
+                Assert.Single(tasks);
         }
 
         [Fact]
@@ -64,6 +68,7 @@ namespace TaskTracker.Tests
             // Створюємо трековану задачу
             var trackedTask = new TrackedTask
             {
+                Id = 1,
                 Title = "Original Title",
                 Description = "Original Description",
                 IsCompleted = false,
@@ -82,7 +87,7 @@ namespace TaskTracker.Tests
                 Id = trackedTask.Id, // Вказуємо правильний ID
                 Title = "Update Title",
                 Description = "Update Description",
-                IsCompleted = true,
+                IsCompleted = true, // Ставимо true для IsCompleted
                 Priority = "Low",
                 CreatedAt = trackedTask.CreatedAt, // Залишаємо ту ж саму дату створення
                 UserId = trackedTask.UserId // Залишаємо того ж користувача
@@ -97,12 +102,12 @@ namespace TaskTracker.Tests
             // Перевіряємо, що результат - це NoContentResult
             var actionResult = Assert.IsType<NoContentResult>(result);
 
-            // Перевіряємо, чи оновлені данні
+            // Перевіряємо, чи оновлені дані
             var updatedEntity = await _context.TrackedTasks.FindAsync(trackedTask.Id);
             Assert.NotNull(updatedEntity); // Переконуємось, що задача існує
             Assert.Equal(updatedTask.Title, updatedEntity.Title);
             Assert.Equal(updatedTask.Description, updatedEntity.Description);
-            Assert.True(updatedEntity.IsCompleted);
+            Assert.True(updatedEntity.IsCompleted); // Переконуємось, що IsCompleted стало true
             Assert.Equal(updatedTask.Priority, updatedEntity.Priority);
         }
 

@@ -80,6 +80,8 @@ namespace TaskTracker.Controllers
 
             existingTask.Title = trackedTask.Title;
             existingTask.Description = trackedTask.Description;
+            existingTask.IsCompleted = trackedTask.IsCompleted;
+            existingTask.Priority = trackedTask.Priority;
 
             try
             {
