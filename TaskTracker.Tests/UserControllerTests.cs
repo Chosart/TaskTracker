@@ -105,7 +105,7 @@ namespace TaskTracker.Tests
             var result = await _controller.CreateUser(user);
 
             // Assert
-            var createdResult = Assert.IsType<CreatedAtActionResult>(result);
+            var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
             var createdUser = Assert.IsType<User>(createdResult.Value);
             Assert.Equal(user.UserName, createdUser.UserName);
         }

@@ -26,6 +26,10 @@ namespace TaskTracker.Tests
 
             _context = new TaskTrackerContext(options);
 
+            // Очищення бази даних
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
+
             // Замокуємо конфігурації
             _mockConfig = new Mock<IConfiguration>();
             _mockConfig.Setup(c => c["AppSettings:Token"]).Returns("TestToken");
@@ -34,10 +38,6 @@ namespace TaskTracker.Tests
 
             // Передаємо контекст в контролер
             _controller = new AuthController(_context, _mockConfig.Object);
-
-            // Очищення бази даних
-            _context.Database.EnsureDeleted();
-            _context.Database.EnsureCreated();
         }
 
         [Fact]
