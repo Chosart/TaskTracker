@@ -37,25 +37,22 @@ namespace TaskTracker.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser(User user)
         {
-            // Перевірка на null
             if (user == null)
             {
                 return BadRequest("User cannot be null.");
             }
 
-            // Перевірка на обов'язкові поля
             if (string.IsNullOrEmpty(user.PasswordHash) || string.IsNullOrEmpty(user.Salt))
             {
                 return BadRequest("PasswordHash and Salt are required.");
             }
 
-            // Додавання користувача в базу
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            // Повернення створеного користувача з 201 статусом
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
+
 
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateUser(int id, User user)

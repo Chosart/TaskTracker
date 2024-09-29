@@ -25,6 +25,10 @@ namespace TaskTracker.Tests
             _context = new TaskTrackerContext(options);
             _controller = new UserController(_context);
 
+            // Очищення бази даних перед тестами
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
+
             // Додаємо тестових користувачів безпосередньо тут
             _context.Users.AddRange(new List<User>
             {
@@ -116,8 +120,9 @@ namespace TaskTracker.Tests
             var result = await _controller.CreateUser(nullUser);
 
             // Assert
-            var actionResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("User cannot be null.", actionResult.Value);
+            var actionResult = Assert.IsType<ActionResult<User>>(result);
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(actionResult.Result);
+            Assert.Equal("User cannot be null.", badRequestResult.Value);
         }
 
         [Fact]
