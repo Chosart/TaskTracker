@@ -34,6 +34,10 @@ namespace TaskTracker.Tests
 
             // Передаємо контекст в контролер
             _controller = new AuthController(_context, _mockConfig.Object);
+
+            // Очищення бази даних
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
         }
 
         [Fact]

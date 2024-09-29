@@ -28,8 +28,22 @@ namespace TaskTracker.Tests
             // Додаємо тестових користувачів безпосередньо тут
             _context.Users.AddRange(new List<User>
             {
-                new User { Id = 1, UserName = "User1", Email = "user1@example.com" },
-                new User { Id = 2, UserName = "User2", Email = "user2@example.com" }
+                new User 
+                {
+                    Id = 1, 
+                    UserName = "User1",
+                    Email = "user1@example.com",
+                    PasswordHash = "hashedpassword",
+                    Salt = "somesalt"
+                },
+                new User 
+                {
+                    Id = 2, 
+                    UserName = "User2", 
+                    Email = "user2@example.com",
+                    PasswordHash = "hashedpassword",
+                    Salt = "somesalt"
+                }
             });
 
             _context.SaveChanges();
@@ -75,31 +89,35 @@ namespace TaskTracker.Tests
         public async Task CreateUser_ValidUser_ReturnsCreatedResult()
         {
             // Arrange
-            var newUser = new User
+            var user = new User
             {
                 UserName = "User3",
                 Email = "user3@gmail.com",
-                PasswordHash = "Password123"
+                PasswordHash = "hashedpassword",
+                Salt = "somesalt"
             };
 
             // Act
-            var result = await _controller.CreateUser(newUser);
+            var result = await _controller.CreateUser(user);
 
             // Assert
-            var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
+            var createdResult = Assert.IsType<CreatedAtActionResult>(result);
             var createdUser = Assert.IsType<User>(createdResult.Value);
-            Assert.Equal("User3", createdUser.UserName);
+            Assert.Equal(user.UserName, createdUser.UserName);
         }
 
         [Fact]
         public async Task CreateUser_NullUser_ReturnsBadRequest()
         {
+            // Arrange
+            User nullUser = null;
+
             // Act
-            var resut = await _controller.CreateUser(null);
+            var result = await _controller.CreateUser(nullUser);
 
             // Assert
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(resut.Result);
-            Assert.Equal("User cannot be null.", badRequestResult.Value);
+            var actionResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("User cannot be null.", actionResult.Value);
         }
 
         [Fact]
@@ -110,7 +128,9 @@ namespace TaskTracker.Tests
             {
                 Id = 1,
                 UserName = "UpdatedUser1",
-                Email = "updated1@gmail.com"
+                Email = "updated1@gmail.com",
+                PasswordHash = "hashedpassword",
+                Salt = "somesalt"
             };
 
             // Act
