@@ -72,7 +72,7 @@ namespace TaskTracker.Tests
             var result = await _controller.GetUser(1);
 
             // Assert
-            var okResult = Assert.IsType<ActionResult<User>>(result);
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
             var returnedUser = Assert.IsType<User>(okResult.Value);
 
             Assert.NotNull(returnedUser);
