@@ -74,6 +74,8 @@ namespace TaskTracker.Tests
             // Assert
             var okResult = Assert.IsType<ActionResult<User>>(result);
             var returnedUser = Assert.IsType<User>(okResult.Value);
+
+            Assert.NotNull(returnedUser);
             Assert.Equal("User1", returnedUser.UserName);
         }
 

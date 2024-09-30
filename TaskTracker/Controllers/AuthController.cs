@@ -26,16 +26,15 @@ namespace TaskTracker.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> Register([FromBody] RegisterDto registerDto)
+        public async Task<ActionResult<User>> Register(RegisterDto registerDto)
         {
             if (registerDto == null)
                 return BadRequest(new ErrorResponse("User data is required."));
 
-            if (await _context.Users.AnyAsync(u => u.UserName == registerDto.UserName))
-                return BadRequest(new ErrorResponse("UserName is already taken."));
-
-            if (await _context.Users.AnyAsync(u => u.Email == registerDto.Email))
-                return BadRequest(new ErrorResponse("Email is already in use."));
+            if (_context.Users.Any(u => u.UserName == registerDto.UserName || u.Email == registerDto.Email))
+            {
+                return BadRequest(new ErrorResponse("UserName or Email is already taken."));
+            }
 
             var user = new User
             {

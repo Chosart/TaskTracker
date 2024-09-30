@@ -61,6 +61,9 @@ namespace TaskTracker.Tests
             _context.Users.Add(existingUser);
             await _context.SaveChangesAsync();
 
+            // Очищаємо контекст перед новими операціями
+            _context.ChangeTracker.Clear();
+
             var result = await _controller.Register(registerDto);
 
             var actionResult = Assert.IsType<BadRequestObjectResult>(result.Result);
@@ -68,7 +71,7 @@ namespace TaskTracker.Tests
 
             Assert.NotNull(errorResponse);
             // Перевірка правильності повідомлення
-            Assert.Equal("UserName is already taken.", errorResponse.Message);
+            Assert.Equal("UserName or Email is already taken.", errorResponse.Message);
         }
 
         [Fact]
