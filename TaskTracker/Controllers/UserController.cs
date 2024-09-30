@@ -20,7 +20,8 @@ namespace TaskTracker.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            var users = await _context.Users.ToListAsync();
+            return Ok(users);
         }
 
         [HttpGet("{id}")]
@@ -97,7 +98,7 @@ namespace TaskTracker.Controllers
         public async Task<ActionResult> DeleteUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            if (user == null)    
             {
                 return NotFound("User not found.");
             }

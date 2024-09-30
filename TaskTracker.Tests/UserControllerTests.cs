@@ -59,7 +59,7 @@ namespace TaskTracker.Tests
             // Act
             var result = await _controller.GetUsers();
 
-            //Accert
+            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             var returnedUsers = Assert.IsAssignableFrom<IEnumerable<User>>(okResult.Value);
             Assert.Equal(2, returnedUsers.Count());
