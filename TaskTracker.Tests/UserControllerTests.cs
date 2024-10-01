@@ -19,7 +19,7 @@ namespace TaskTracker.Tests
         {
             // Використовуємо in-memory базу данних
             var options = new DbContextOptionsBuilder<TaskTrackerContext>()
-                .UseInMemoryDatabase("TestDatabase")
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
 
             _context = new TaskTrackerContext(options);
@@ -28,7 +28,11 @@ namespace TaskTracker.Tests
             // Очищення бази даних перед тестами
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
+
+            // Додаємо тестових користувачів
+            SeedDatabase();
         }
+
         private void SeedDatabase()
         {
             if (!_context.Users.Any())
@@ -76,6 +80,9 @@ namespace TaskTracker.Tests
         [Fact]
         public async Task GetUser_ExistingUser_ReturnsOkResult()
         {
+            // Arrange
+            SeedDatabase();
+
             // Act
             var result = await _controller.GetUser(1);
 
@@ -140,6 +147,7 @@ namespace TaskTracker.Tests
         {
             // Arrange
             var existingUser = await _context.Users.FindAsync(1);
+            Assert.NotNull(existingUser);
             existingUser.UserName = "UpdatedUser1";
             existingUser.Email = "updated1@gmail.com";
 
@@ -173,8 +181,6 @@ namespace TaskTracker.Tests
         [Fact]
         public async Task DeleteUser_ExistingUser_ReturnsNoContent()
         {
-            // Arrange
-            SeedDatabase();
 
             // Act
             var result = await _controller.DeleteUser(1);

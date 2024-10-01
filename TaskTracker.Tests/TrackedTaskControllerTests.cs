@@ -21,7 +21,7 @@ namespace TaskTracker.Tests
         {
             // Використовуємо in-memory базу данних
             var options = new DbContextOptionsBuilder<TaskTrackerContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase")
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
 
             _context = new TaskTrackerContext(options);
