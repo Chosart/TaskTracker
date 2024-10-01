@@ -34,8 +34,10 @@ namespace TaskTracker.Tests
         }
         private void SeedDatabase()
         {
-            _context.Users.AddRange(new List<User>
+            if (!_context.Users.Any())
             {
+                _context.Users.AddRange(new List<User>
+                {
                 new User
                 {
                     Id = 1,
@@ -52,21 +54,26 @@ namespace TaskTracker.Tests
                     PasswordHash = "hashedpassword",
                     Salt = "somesalt"
                 }
-            });
+             });
 
-            _context.SaveChanges();
+                _context.SaveChanges();
+            }
         }
 
         [Fact]
         public async Task GetUsers_ReturnsListOfUsers()
         {
+            // Arrange
+            SeedDatabase();
+
             // Act
             var result = await _controller.GetUsers();
 
             // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnedUsers = Assert.IsAssignableFrom<IEnumerable<User>>(okResult.Value);
-            Assert.Equal(2, returnedUsers.Count());
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<User>>>(result);
+            var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
+            var users = Assert.IsAssignableFrom<IEnumerable<User>>(okResult.Value);
+            Assert.Equal(2, users.Count());
         }
 
         [Fact]
