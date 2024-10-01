@@ -12,21 +12,21 @@ using System.Threading.Tasks;
 
 namespace TaskTracker.Tests
 {
-    public class AuthControllerTests 
+    public class AuthControllerTests
     {
         private readonly AuthController _controller;
         private readonly TaskTrackerContext _context;
         private readonly Mock<IConfiguration> _mockConfig;
+        private readonly DbContextOptions<TaskTrackerContext> _options;
+
         public AuthControllerTests()
         {
-            // Використовуємо in-memory базу данних
-            var options = new DbContextOptionsBuilder<TaskTrackerContext>()
+            // Ініціалізуємо контекст бази даних
+            _options = new DbContextOptionsBuilder<TaskTrackerContext>()
                 .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
 
-            _context = new TaskTrackerContext(options);
-
-            // Очищення бази даних
+            _context = new TaskTrackerContext(_options);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
 
@@ -38,6 +38,11 @@ namespace TaskTracker.Tests
 
             // Передаємо контекст в контролер
             _controller = new AuthController(_context, _mockConfig.Object);
+        }
+
+        public AuthController Get_controller()
+        {
+            return _controller;
         }
 
         [Fact]
@@ -60,9 +65,6 @@ namespace TaskTracker.Tests
             existingUser.SetPassword("Password123"); // Хешуємо пароль
             _context.Users.Add(existingUser);
             await _context.SaveChangesAsync();
-
-            // Очищаємо контекст перед новими операціями
-            _context.ChangeTracker.Clear();
 
             var result = await _controller.Register(registerDto);
 
