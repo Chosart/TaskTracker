@@ -28,9 +28,6 @@ namespace TaskTracker.Tests
             // Очищення бази даних перед тестами
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
-
-            // Додаємо тестових користувачів безпосередньо тут
-            SeedDatabase();
         }
         private void SeedDatabase()
         {
@@ -38,23 +35,23 @@ namespace TaskTracker.Tests
             {
                 _context.Users.AddRange(new List<User>
                 {
-                new User
-                {
-                    Id = 1,
-                    UserName = "User1",
-                    Email = "user1@example.com",
-                    PasswordHash = "hashedpassword",
-                    Salt = "somesalt"
-                },
-                new User
-                {
-                    Id = 2,
-                    UserName = "User2",
-                    Email = "user2@example.com",
-                    PasswordHash = "hashedpassword",
-                    Salt = "somesalt"
-                }
-             });
+                    new User
+                    {
+                        Id = 1,
+                        UserName = "User1",
+                        Email = "user1@example.com",
+                        PasswordHash = "hashedpassword",
+                        Salt = "somesalt"
+                    },
+                    new User
+                    {
+                        Id = 2,
+                        UserName = "User2",
+                        Email = "user2@example.com",
+                        PasswordHash = "hashedpassword",
+                        Salt = "somesalt"
+                    }
+                });
 
                 _context.SaveChanges();
             }
@@ -176,6 +173,9 @@ namespace TaskTracker.Tests
         [Fact]
         public async Task DeleteUser_ExistingUser_ReturnsNoContent()
         {
+            // Arrange
+            SeedDatabase();
+
             // Act
             var result = await _controller.DeleteUser(1);
 
