@@ -58,6 +58,11 @@ namespace TaskTracker.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateUser(int id, User user)
         {
+            if (user == null)
+            {
+                return BadRequest("User cannot be null.");
+            }
+
             if (id != user.Id)
             {
                 return BadRequest("ID in the URL does not match the user ID.");
@@ -77,19 +82,8 @@ namespace TaskTracker.Controllers
             {
                 existingUser.SetPassword(user.PasswordHash);
             }
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound("User not found.");
-                }
-                throw;
-            }
+            
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

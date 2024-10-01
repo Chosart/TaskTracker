@@ -30,20 +30,24 @@ namespace TaskTracker.Tests
             _context.Database.EnsureCreated();
 
             // Додаємо тестових користувачів безпосередньо тут
+            SeedDatabase();
+        }
+        private void SeedDatabase()
+        {
             _context.Users.AddRange(new List<User>
             {
-                new User 
+                new User
                 {
-                    Id = 1, 
+                    Id = 1,
                     UserName = "User1",
                     Email = "user1@example.com",
                     PasswordHash = "hashedpassword",
                     Salt = "somesalt"
                 },
-                new User 
+                new User
                 {
-                    Id = 2, 
-                    UserName = "User2", 
+                    Id = 2,
+                    UserName = "User2",
                     Email = "user2@example.com",
                     PasswordHash = "hashedpassword",
                     Salt = "somesalt"
@@ -131,17 +135,12 @@ namespace TaskTracker.Tests
         public async Task UpdateUser_ExistingUser_ReturnsNoContent()
         {
             // Arrange
-            var updatedUser = new User
-            {
-                Id = 1,
-                UserName = "UpdatedUser1",
-                Email = "updated1@gmail.com",
-                PasswordHash = "hashedpassword",
-                Salt = "somesalt"
-            };
+            var existingUser = await _context.Users.FindAsync(1);
+            existingUser.UserName = "UpdatedUser1";
+            existingUser.Email = "updated1@gmail.com";
 
             // Act
-            var result = await _controller.UpdateUser(updatedUser.Id, updatedUser);
+            var result = await _controller.UpdateUser(existingUser.Id, existingUser);
 
             // Assert
             Assert.IsType<NoContentResult>(result);
