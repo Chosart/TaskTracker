@@ -27,7 +27,7 @@ namespace TaskTracker.Models
         /// <param name="password">Пароль для хешування</param>
 
         [JsonIgnore] // Запобігаємо циклічній серіалізації
-        public ICollection<TrackedTask> Tasks { get; set; }
+        public ICollection<TrackedTask> Tasks { get; set; } = new List<TrackedTask>(); // Ініціалізація колекції
 
         public string Salt { get; set; }
 

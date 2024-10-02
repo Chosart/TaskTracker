@@ -12,7 +12,7 @@ using TaskTracker.Data;
 namespace TaskTracker.Migrations
 {
     [DbContext(typeof(TaskTrackerContext))]
-    [Migration("20241002160946_FixBugs")]
+    [Migration("20241002171344_FixBugs")]
     partial class FixBugs
     {
         /// <inheritdoc />
