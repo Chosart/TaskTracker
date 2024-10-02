@@ -59,7 +59,44 @@ namespace TaskTracker.Tests
             var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
 
             // Перевіряємо, що в списку лише одна задача
-                Assert.Single(tasks);
+            Assert.Single(tasks);
+        }
+
+        [Fact]
+        public async Task FilterTrackedTasks_ByStatus_ReturnsFilteredTasks()
+        {
+            // Створюємо декілька трекованих задач
+            var task1 = new TrackedTask
+            {
+                Title = "Task 1",
+                Status = "Open",
+                Priority = "High",
+                CreatedAt = 1234567890,
+                UserId = 1
+            };
+
+            var task2 = new TrackedTask
+            {
+                Title = "Task 2",
+                Status = "Closed",
+                Priority = "Medium",
+                CreatedAt = 1234567890,
+                UserId = 1
+            };
+
+            _context.TrackedTasks.AddRange(task1, task2);
+            await _context.SaveChangesAsync();
+
+            // Виклик методу фільтрації за статусом
+            var filterDto = new TaskFilterDto { Status = "Open" };
+            var result = await _controller.FilterTrackedTasks(filterDto);
+
+            // Перевірка, що повертається правильна задача
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);   
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult);
+
+            Assert.Single(tasks);
+            Assert.Equal("Task 1", tasks[0].Title);
         }
 
         [Fact]
