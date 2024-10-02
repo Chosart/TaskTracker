@@ -27,5 +27,11 @@ namespace TaskTracker.Models
         public int UserId { get; set; }
 
         public User User { get; set; }
+
+        [Required]
+        public string Status { get; set; }
+
+        [Required]
+        public string TaskPriority { get; set; }
     }
 }
