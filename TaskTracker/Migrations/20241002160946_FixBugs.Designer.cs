@@ -12,8 +12,8 @@ using TaskTracker.Data;
 namespace TaskTracker.Migrations
 {
     [DbContext(typeof(TaskTrackerContext))]
-    [Migration("20240928052337_FixAnyBugs")]
-    partial class FixAnyBugs
+    [Migration("20241002160946_FixBugs")]
+    partial class FixBugs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
