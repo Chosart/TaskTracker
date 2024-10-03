@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TaskTracker.Controllers;
 using TaskTracker.Data;
+using TaskTracker.DTO;
 using TaskTracker.Models;
 
 namespace TaskTracker.Tests
@@ -62,6 +64,23 @@ namespace TaskTracker.Tests
 
             _context.TrackedTasks.AddRange(task1, task2, task3);
             _context.SaveChanges();
+        }
+
+        [Fact]
+        public async Task FilterTrackedTasks_ByStatus_ReturnsFilteredTasks()
+        {
+            // Arrange
+            SeedTasks(); // Сіюємо задачі перед тестуванням
+
+            var filterDto = new TaskFilterDto { Status = "Open" };
+            var result = await _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Equal(2, tasks.Count); // Має бути 2 відкриті задачі
+            Assert.All(tasks, task => Assert.Equal("Open", task.Status));
         }
     }
 }
