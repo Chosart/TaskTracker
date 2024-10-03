@@ -115,5 +115,24 @@ namespace TaskTracker.Tests
 
             Assert.Equal(2, tasks.Count); // Має бути 2 задачі, створені після 2 днів тому
         }
+
+        [Fact]
+        public async Task FilterTrackedTasks_ByCreatedBefore_ReturnsFilteredTasks()
+        {
+            // Arrange
+            SeedTasks();
+
+            // Створюємо дату, до якої будемо фільтрувати
+            var filterDto = new TaskFilterDto { CreatedBefore = DateTime.UtcNow.AddDays(-1) };
+            var result = await _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Equal(2, tasks.Count); // Має бути 2 задачі, створені до 1 дня тому
+            Assert.Contains(tasks, task => task.Title == "Task 1");
+            Assert.Contains(tasks, task => task.Title == "Task 3");
+        }
     }
 }
