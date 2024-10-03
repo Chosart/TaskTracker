@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TaskTracker.Controllers;
 using TaskTracker.Data;
+using TaskTracker.Models;
 
 namespace TaskTracker.Tests
 {
@@ -27,6 +29,39 @@ namespace TaskTracker.Tests
             // Очищення бази даних перед тестами
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
+        }
+
+        private void SeedTasks()
+        {
+            var task1 = new TrackedTask
+            {
+                Title = "Task 1",
+                Status = "Open",
+                Priority = "High",
+                CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-2).ToUnixTimeSeconds()), // 2 дні тому
+                UserId = 1
+            };
+
+            var task2 = new TrackedTask
+            {
+                Title = "Task 2",
+                Status = "Open",
+                Priority = "Low",
+                CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeSeconds()), // 1 дні тому
+                UserId = 1
+            };
+
+            var task3 = new TrackedTask
+            {
+                Title = "Task 2",
+                Status = "Closed",
+                Priority = "Medium",
+                CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-3).ToUnixTimeSeconds()), // 3 дні тому
+                UserId = 1
+            };
+
+            _context.TrackedTasks.AddRange(task1, task2, task3);
+            _context.SaveChanges();
         }
     }
 }
