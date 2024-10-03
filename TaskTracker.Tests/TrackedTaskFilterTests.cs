@@ -99,5 +99,21 @@ namespace TaskTracker.Tests
             Assert.Single(tasks);
             Assert.Equal("Task 1", tasks[0].Title);
         }
+
+        [Fact]
+        public async Task FilterTrackedTasks_ByCreatedAfter_ReturnsFilteredTasks()
+        {
+            // Arrange
+            SeedTasks();
+
+            var filterDto = new TaskFilterDto { CreatedAfter = DateTime.UtcNow.AddDays(-2) };
+            var result = _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Equal(2, tasks.Count); // Має бути 2 задачі, створені після 2 днів тому
+        }
     }
 }
