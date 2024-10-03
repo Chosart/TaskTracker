@@ -82,5 +82,22 @@ namespace TaskTracker.Tests
             Assert.Equal(2, tasks.Count); // Має бути 2 відкриті задачі
             Assert.All(tasks, task => Assert.Equal("Open", task.Status));
         }
+
+        [Fact]
+        public async Task FilterTrackedTasks_ByPriority_ReturnsFilteredTasks()
+        {
+            // Arrange
+            SeedTasks();
+
+            var filterDto = new TaskFilterDto { TaskPriority = "High" };
+            var result = await _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Single(tasks);
+            Assert.Equal("Task 1", tasks[0].Title);
+        }
     }
 }
