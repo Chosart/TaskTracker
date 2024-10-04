@@ -134,5 +134,22 @@ namespace TaskTracker.Tests
             Assert.Contains(tasks, task => task.Title == "Task 1");
             Assert.Contains(tasks, task => task.Title == "Task 3");
         }
+
+        [Fact]
+        public async Task FilterTrackedTasks_ByStatusAndPriority_ReturnsFilteredTasks()
+        {
+            // Arrange 
+            SeedTasks();
+
+            var filterDto = new TaskFilterDto { Status = "Open", TaskPriority = "High" };
+            var result = _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Single(tasks); // Має бути 1 задача
+            Assert.Equal("Task 1", tasks[0].Title); // Перевіряємо, що це правильна задача
+        }
     }
 }
