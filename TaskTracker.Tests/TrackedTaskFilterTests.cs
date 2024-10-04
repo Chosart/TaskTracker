@@ -142,7 +142,7 @@ namespace TaskTracker.Tests
             SeedTasks();
 
             var filterDto = new TaskFilterDto { Status = "Open", TaskPriority = "High" };
-            var result = _controller.FilterTrackedTasks(filterDto);
+            var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
@@ -150,6 +150,22 @@ namespace TaskTracker.Tests
 
             Assert.Single(tasks); // Має бути 1 задача
             Assert.Equal("Task 1", tasks[0].Title); // Перевіряємо, що це правильна задача
+        }
+
+        [Fact]
+        public async Task FilterTrackedTasks_NoMatchingStatus_ReturnsEmptyList()
+        {
+            // Arrange
+            SeedTasks();
+
+            var filterDto = new TaskFilterDto { Status = "NoExistentStatus" };
+            var result = await _controller.FilterTrackedTasks(filterDto);
+
+            // Assert 
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Empty(tasks);
         }
     }
 }
