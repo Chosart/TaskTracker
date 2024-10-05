@@ -200,5 +200,18 @@ namespace TaskTracker.Tests
 
             Assert.Equal(3, tasks.Count);
         }
+
+        [Fact]
+        public async Task FilterTrackedTasks_InvalidData_ReturnsBadRequest()
+        {
+            // Arrange
+            SeedTasks();
+
+            var filterDto = new TaskFilterDto { Status = null };
+            var result = _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            Assert.IsType<BadRequestResult>(result.Result);
+        }
     }
 }
