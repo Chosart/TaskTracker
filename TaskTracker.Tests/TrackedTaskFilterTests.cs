@@ -229,5 +229,21 @@ namespace TaskTracker.Tests
             Assert.Single(tasks);
             Assert.Equal("Task 1", tasks[0].Title);
         }
+
+        [Fact]
+        public async Task FilterTrackedTasks_MultipleStatuses_ReturnsFilteredTasks()
+        {
+            // Arrange
+            SeedTasks();
+
+            var filterDto = new TaskFilterDto { Statuses = new List<string> { "Open", "Closed" } }; // Додайте поле для кількох статусів
+            var result = await _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Equal(3, tasks.Count); // Має бути 3 задачі з різними статусами
+        }
     }
 }
