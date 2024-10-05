@@ -184,5 +184,21 @@ namespace TaskTracker.Tests
             var updatedEntity = await _context.TrackedTasks.FindAsync(task.Id);
             Assert.Equal("Closed", updatedEntity.Status);
         }
+
+        [Fact]
+        public async Task FilterTrackedTasks_ByUser_ReturnsFilteredTasks()
+        {
+            // Arrange
+            SeedTasks();
+
+            var filterDto = new TaskFilterDto { UserId = 1 }; // Фільтрація за UserId
+            var result = _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Equal(3, tasks.Count);
+        }
     }
 }
