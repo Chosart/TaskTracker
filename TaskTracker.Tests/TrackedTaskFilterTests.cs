@@ -167,5 +167,22 @@ namespace TaskTracker.Tests
 
             Assert.Empty(tasks);
         }
+
+        [Fact]
+        public async Task UpdateTaskPriority_ExistingTask_ReturnsNoContent()
+        {
+            // Arrange
+            SeedTasks();
+            var task = await _context.TrackedTasks.FirstAsync(); // Отримуємо існуючу задачу
+            task.Status = "Closed"; // Змінюємо статус на Closed
+
+            // Act
+            var result = await _controller.UpdateTrackedTask(task.Id, task);    
+
+            // Assert
+            Assert.IsType<NoContentResult>(result);
+            var updatedEntity = await _context.TrackedTasks.FindAsync(task.Id);
+            Assert.Equal("Closed", updatedEntity.Status);
+        }
     }
 }
