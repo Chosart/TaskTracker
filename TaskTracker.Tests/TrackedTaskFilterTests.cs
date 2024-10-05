@@ -350,5 +350,21 @@ namespace TaskTracker.Tests
             // Assert
             Assert.IsType<BadRequest>(result.Result);
         }
+
+        [Fact]
+        public async Task FilterTrackedTasks_ByNonExistentUser_ReturnsEmptyList()
+        {
+            // Arrange
+            SeedTasks();
+
+            var filterDto = new TaskFilterDto { UserId = 999 }; // Користувач, якого немає
+            var result = await _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Empty(tasks);  // Не має повертати жодну задачу
+        }
     }
 }
