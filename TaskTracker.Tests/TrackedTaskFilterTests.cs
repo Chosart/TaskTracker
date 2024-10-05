@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TaskTracker.Controllers;
@@ -23,6 +24,7 @@ namespace TaskTracker.Tests
             // Налаштування in-memory бази даних
             var options = new DbContextOptionsBuilder<TaskTrackerContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .EnableSensitiveDataLogging()
                 .Options;
 
             _context = new TaskTrackerContext(options);
@@ -40,6 +42,7 @@ namespace TaskTracker.Tests
                 Title = "Task 1",
                 Status = "Open",
                 Priority = "High",
+                Description = "Description for Task 1",
                 CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-2).ToUnixTimeSeconds()), // 2 дні тому
                 UserId = 1
             };
@@ -49,6 +52,7 @@ namespace TaskTracker.Tests
                 Title = "Task 2",
                 Status = "Open",
                 Priority = "Low",
+                Description = "Description for Task 2",
                 CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeSeconds()), // 1 дні тому
                 UserId = 1
             };
@@ -58,6 +62,7 @@ namespace TaskTracker.Tests
                 Title = "Task 2",
                 Status = "Closed",
                 Priority = "Medium",
+                Description = "Description for Task 3",
                 CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-3).ToUnixTimeSeconds()), // 3 дні тому
                 UserId = 1
             };
@@ -89,7 +94,7 @@ namespace TaskTracker.Tests
             // Arrange
             SeedTasks();
 
-            var filterDto = new TaskFilterDto { TaskPriority = "High" };
+            var filterDto = new TaskFilterDto { Priority = "High" };
             var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
@@ -141,7 +146,7 @@ namespace TaskTracker.Tests
             // Arrange 
             SeedTasks();
 
-            var filterDto = new TaskFilterDto { Status = "Open", TaskPriority = "High" };
+            var filterDto = new TaskFilterDto { Status = "Open", Priority = "High" };
             var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
@@ -158,11 +163,23 @@ namespace TaskTracker.Tests
             // Arrange
             SeedTasks();
 
-            var filterDto = new TaskFilterDto { Status = "NoExistentStatus" };
+            var filterDto = new TaskFilterDto 
+            {
+                Status = "NonExistentStatus",
+                Priority = null,
+                UserId = null,
+                CreatedAfter = null,
+                CreatedBefore = null,
+                Statuses = new  List<string>()
+
+            };
+
+            // Act
             var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert 
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
 
             Assert.Empty(tasks);
@@ -173,8 +190,12 @@ namespace TaskTracker.Tests
         {
             // Arrange
             SeedTasks();
+
             var task = await _context.TrackedTasks.FirstAsync(); // Отримуємо існуючу задачу
+
+            // Оновлюємо лише ті поля, які потрібні
             task.Status = "Closed"; // Змінюємо статус на Closed
+            task.Priority = "Medium";
 
             // Act
             var result = await _controller.UpdateTrackedTask(task.Id, task);    
@@ -219,7 +240,7 @@ namespace TaskTracker.Tests
         {
             // Arrange
             SeedTasks();
-            var filterDto = new TaskFilterDto { Status = "Open", TaskPriority = "High" };
+            var filterDto = new TaskFilterDto { Status = "Open", Priority = "High" };
             var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
@@ -283,7 +304,7 @@ namespace TaskTracker.Tests
             // Arrange
             SeedTasks();
 
-            var filterDto = new TaskFilterDto { TaskPriority = "NonExistentPriority" };
+            var filterDto = new TaskFilterDto { Priority = "NonExistentPriority" };
             var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
@@ -339,7 +360,7 @@ namespace TaskTracker.Tests
             var filterDto = new TaskFilterDto
             {
                 Status = null,
-                TaskPriority = null,
+                Priority = null,
                 UserId = null,
                 CreatedAfter = DateTime.MinValue,
                 CreatedBefore = DateTime.MaxValue,

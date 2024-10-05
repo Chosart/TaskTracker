@@ -40,9 +40,20 @@ namespace TaskTracker.Controllers
 
         // Метод для фільтрації задач
         [HttpGet("filter")]
-        [Authorize]
         public async Task<ActionResult<IEnumerable<TrackedTask>>> FilterTrackedTasks([FromQuery] TaskFilterDto filter)
         {
+            // Перевірка на null для filter
+            if (filter == null)
+            {
+                return BadRequest("Filter cannot be null.");
+            }
+
+            // Перевірка на null для кожного поля
+            if (filter.Status == null && filter.Priority == null && filter.UserId == null && !filter.CreatedAfter.HasValue && !filter.CreatedBefore.HasValue)
+            {
+                return BadRequest("At least one filter must be provided.");
+            }
+
             // Витягуємо ID користувача з токена
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             var userId = userIdClaim != null ? userIdClaim.Value : null;
@@ -57,15 +68,21 @@ namespace TaskTracker.Controllers
             }
 
             // Додаємо фільтрацію за пріорітетом, якщо він переданий
-            if (!string.IsNullOrEmpty(filter.TaskPriority))
+            if (!string.IsNullOrEmpty(filter.Priority))
             {
-                query = query.Where(t => t.TaskPriority == filter.TaskPriority);
+                query = query.Where(t => t.Priority == filter.Priority);
             }
 
             // Додаємо фільтрацію за користувачем
-            if (!string.IsNullOrEmpty(userId))
+            if (userId != null)
             {
                 query = query.Where(t => t.UserId.ToString() == userId);
+            }
+
+            // Додаємо фільтрацію за користувачами
+            if (filter.Statuses != null && filter.Statuses.Any())
+            {
+                query = query.Where(t => filter.Statuses.Contains(t.Status));
             }
 
             // Додає фільтрацію за датою створення, якщо вона передана

@@ -30,8 +30,5 @@ namespace TaskTracker.Models
 
         [Required]
         public string Status { get; set; }
-
-        [Required]
-        public string TaskPriority { get; set; }
     }
 }
