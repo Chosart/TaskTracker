@@ -5,6 +5,8 @@ using TaskTracker.Models;
 using Microsoft.EntityFrameworkCore;
 using TaskTracker.DTO;
 using System.Data;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace TaskTracker.Controllers
 {
@@ -38,8 +40,13 @@ namespace TaskTracker.Controllers
 
         // Метод для фільтрації задач
         [HttpGet("filter")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<TrackedTask>>> FilterTrackedTasks([FromQuery] TaskFilterDto filter)
         {
+            // Витягуємо ID користувача з токена
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var userId = userIdClaim != null ? userIdClaim.Value : null;
+
             // Створюємо запит, який буде базуватися на таблиці TrackedTasks
             var query = _context.TrackedTasks.AsQueryable();
 
@@ -55,8 +62,14 @@ namespace TaskTracker.Controllers
                 query = query.Where(t => t.TaskPriority == filter.TaskPriority);
             }
 
+            // Додаємо фільтрацію за користувачем
+            if (!string.IsNullOrEmpty(userId))
+            {
+                query = query.Where(t => t.UserId.ToString() == userId);
+            }
+
             // Додає фільтрацію за датою створення, якщо вона передана
-            if(filter.CreatedAfter.HasValue)
+            if (filter.CreatedAfter.HasValue)
             {
                 query = query.Where(t => t.CreatedAt >= ((DateTimeOffset)filter.CreatedAfter.Value).ToUnixTimeSeconds());
             }
