@@ -192,7 +192,7 @@ namespace TaskTracker.Tests
             SeedTasks();
 
             var filterDto = new TaskFilterDto { UserId = 1 }; // Фільтрація за UserId
-            var result = _controller.FilterTrackedTasks(filterDto);
+            var result =  await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
@@ -208,10 +208,26 @@ namespace TaskTracker.Tests
             SeedTasks();
 
             var filterDto = new TaskFilterDto { Status = null };
-            var result = _controller.FilterTrackedTasks(filterDto);
+            var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
             Assert.IsType<BadRequestResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task FilterTrackedTasks_MultipleFilters_ReturnsCorrectTasks()
+        {
+            // Arrange
+            SeedTasks();
+            var filterDto = new TaskFilterDto { Status = "Open", TaskPriority = "High" };
+            var result = await _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Single(tasks);
+            Assert.Equal("Task 1", tasks[0].Title);
         }
     }
 }
