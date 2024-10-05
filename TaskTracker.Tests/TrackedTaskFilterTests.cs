@@ -292,5 +292,26 @@ namespace TaskTracker.Tests
 
             Assert.Empty(tasks);
         }
+
+        [Fact]
+        public async Task FilterTrackedTasks_ByCreatedBetween_ReturnsFilteredTasks()
+        {
+            // Arrange
+            SeedTasks();
+
+            var fromDate = DateTime.UtcNow.AddDays(-3);
+            var toDate = DateTime.UtcNow.AddDays(-1);
+            var filterDto = new TaskFilterDto { CreatedAfter = fromDate, CreatedBefore = toDate };
+
+            // Act
+            var result = await _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Empty(tasks);
+            Assert.Equal("Task 3", tasks[0].Title);
+        }
     }
 }
