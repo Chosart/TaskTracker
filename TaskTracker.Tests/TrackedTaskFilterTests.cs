@@ -245,5 +245,20 @@ namespace TaskTracker.Tests
 
             Assert.Equal(3, tasks.Count); // Має бути 3 задачі з різними статусами
         }
+
+        [Fact]
+        public async Task FilterTrackedTasks_NoFilters_ReturnsAllTasks()
+        {
+            // Arrange
+            SeedTasks();
+
+            var filterDto = new TaskFilterDto(); // Порожній фільтр
+            var result = await _controller.FilterTrackedTasks(filterDto);
+
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Equal(3, tasks.Count); //  Має повернути всі задачі
+        }       
     }
 }
