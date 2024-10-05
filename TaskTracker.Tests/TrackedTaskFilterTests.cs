@@ -313,5 +313,21 @@ namespace TaskTracker.Tests
             Assert.Empty(tasks);
             Assert.Equal("Task 3", tasks[0].Title);
         }
+
+        [Fact]
+        public async Task FilterTrackedTasks_ByCreatedAfter_WithEmptyList_ReturnsEmptyList()
+        {
+            // Arrange 
+            SeedTasks();
+
+            var filterDto = new TaskFilterDto { CreatedAfter = DateTime.UtcNow }; // Дата в майбутньому
+            var result = await _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+
+            Assert.Empty(tasks);
+        }
     }
 }
