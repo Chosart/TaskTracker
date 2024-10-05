@@ -329,5 +329,26 @@ namespace TaskTracker.Tests
 
             Assert.Empty(tasks);
         }
+
+        [Fact]
+        public async Task FilterTrackedTasks_InvalidData_AllFields_ReturnsBadRequest()
+        {
+            // Arrange
+            SeedTasks();
+
+            var filterDto = new TaskFilterDto
+            {
+                Status = null,
+                TaskPriority = null,
+                UserId = null,
+                CreatedAfter = DateTime.MinValue,
+                CreatedBefore = DateTime.MaxValue,
+            };
+
+            var result = await _controller.FilterTrackedTasks(filterDto);
+
+            // Assert
+            Assert.IsType<BadRequest>(result.Result);
+        }
     }
 }
