@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -172,6 +174,22 @@ namespace TaskTracker.Tests
                 CreatedBefore = null,
                 Statuses = new  List<string>()
 
+            };
+
+            // Mocking the User and the database context
+            var mockUser = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, "1") // приклад ID користувача
+            }));
+
+            // Configure the mock context and controller
+            var context = new Mock<TaskTrackerContext>();
+            var controller = new TrackedTaskController(context.Object)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext { User = mockUser }
+                }
             };
 
             // Act
