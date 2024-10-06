@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaskTracker.Controllers;
@@ -16,6 +16,7 @@ namespace TaskTracker.Tests
     {
         private readonly TrackedTaskController _controller;
         private readonly TaskTrackerContext _context;
+        private readonly Mock<ILogger<TrackedTaskController>> _mockLogger;
 
         public TrackedTaskControllerTests()
         {
@@ -25,7 +26,8 @@ namespace TaskTracker.Tests
                 .Options;
 
             _context = new TaskTrackerContext(options);
-            _controller = new TrackedTaskController(_context);
+            _mockLogger = new Mock<ILogger<TrackedTaskController>>();
+            _controller = new TrackedTaskController(_context, _mockLogger.Object);
 
             // Очищення бази данних перед кожним тестом
             _context.Database.EnsureDeleted();

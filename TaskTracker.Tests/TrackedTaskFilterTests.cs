@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Castle.Core.Logging;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,7 +30,11 @@ namespace TaskTracker.Tests
                 .Options;
 
             _context = new TaskTrackerContext(options);
-            _controller = new TrackedTaskController(_context);
+
+            // Створення мокового логгера
+            var loggerMock = new Mock<ILogger<TrackedTaskController>>();
+
+            _controller = new TrackedTaskController(_context, loggerMock.Object);   
 
             // Очищення бази даних перед тестами
             _context.Database.EnsureDeleted();
