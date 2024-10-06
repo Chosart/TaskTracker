@@ -168,12 +168,9 @@ namespace TaskTracker.Tests
         public async Task FilterTrackedTasks_NoMatchingStatus_ReturnsEmptyList()
         {
             // Arrange
-            SeedTasks()
+            SeedTasks();
 
-            var filterDto = new TaskFilterDto
-            {
-                Status = "NonExistentStatus" // Статус, який не існує
-            };
+            var filterDto = new TaskFilterDto { Status = "NonExistingStatus" };     
 
             // Act
             var result = await _controller.FilterTrackedTasks(filterDto);
@@ -182,7 +179,6 @@ namespace TaskTracker.Tests
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
             var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value); // Перевіряємо, що Value не null
 
-            Assert.NotNull(actionResult.Value); // Перевірка на null
             Assert.Empty(tasks); // Перевіряємо, що список задач пустий
         }
 
@@ -355,21 +351,17 @@ namespace TaskTracker.Tests
         public async Task FilterTrackedTasks_InvalidData_AllFields_ReturnsBadRequest()
         {
             // Arrange
-            SeedTasks();
-
-            var filterDto = new TaskFilterDto
+            var filter = new TaskFilterDto
             {
-                Status = null,
-                Priority = null,
-                UserId = null,
-                CreatedAfter = DateTime.MinValue,
-                CreatedBefore = DateTime.MaxValue,
+                CreatedAfter = new DateTime(10000, 1, 1)
             };
 
-            var result = await _controller.FilterTrackedTasks(filterDto);
+            // Act
+            var result = await _controller.FilterTrackedTasks(filter);
 
             // Assert
-            Assert.IsType<BadRequest>(result.Result);
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("CreatedAfter date is out of range.", badRequestResult.Value);
         }
 
         [Fact]

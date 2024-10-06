@@ -50,6 +50,21 @@ namespace TaskTracker.Controllers
                 return BadRequest("Filter cannot be null.");
             }
 
+            // Перевірка дат
+            if (filter.CreatedAfter.HasValue
+                && (filter.CreatedAfter.Value < new DateTime(1, 1, 1)
+                || filter.CreatedAfter.Value > new DateTime(9999, 12, 31)))
+            {
+                return BadRequest("CreatedAfter date is out of range.");
+            }
+
+            if (filter.CreatedBefore.HasValue
+                && (filter.CreatedBefore.Value < new DateTime(1, 1, 1)
+                || filter.CreatedBefore.Value > new DateTime(9999, 12, 31)))
+            {
+                return BadRequest("CreatedBefore date is out of range.");
+            }
+
             var query = _context.TrackedTasks.AsQueryable();
 
             // Додати фільтрацію за статусом, якщо він переданий
@@ -95,7 +110,7 @@ namespace TaskTracker.Controllers
 
             var tasks = await query.ToListAsync();
 
-            return Ok(tasks);
+            return Ok(tasks ?? new List<TrackedTask>());
         }
 
         [HttpPost]
