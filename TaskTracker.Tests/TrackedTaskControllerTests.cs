@@ -52,9 +52,8 @@ namespace TaskTracker.Tests
             _context.TrackedTasks.Add(trackedTask);
             await _context.SaveChangesAsync();
 
-            // Ініціалізуємо контролер для трекованих задач
-            var trackedTaskController = new TrackedTaskController(_context);
-            var result = await trackedTaskController.GetTrackedTasks();
+            // Виклик методу
+            var result = await _controller.GetTrackedTasks();
 
             // Перевірка, чи повертається список задач
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
@@ -132,11 +131,8 @@ namespace TaskTracker.Tests
                 UserId = trackedTask.UserId // Залишаємо того ж користувача
             };
 
-            // Ініціалізуємо контролер
-            var trackedTaskController = new TrackedTaskController(_context);
-
             // Викликаємо метод оновлення
-            var result = await trackedTaskController.UpdateTrackedTask(trackedTask.Id, updatedTask);
+            var result = await _controller.UpdateTrackedTask(trackedTask.Id, updatedTask);
 
             // Перевіряємо, що результат - це NoContentResult
             var actionResult = Assert.IsType<NoContentResult>(result);

@@ -52,11 +52,17 @@ namespace TaskTracker.Controllers
             }
 
             // Перевірка на null для кожного поля
-            if (filter.Status == null && filter.Priority == null && filter.UserId == null && !filter.CreatedAfter.HasValue && !filter.CreatedBefore.HasValue)
+            if (string.IsNullOrEmpty(filter.Status)
+                && string.IsNullOrEmpty(filter.Priority)
+                && !filter.UserId.HasValue
+                && !filter.CreatedAfter.HasValue
+                && !filter.CreatedBefore.HasValue
+                && (filter.Statuses == null || !filter.Statuses.Any())
+                && !filter.Limit.HasValue)
             {
                 _logger.LogWarning("No filters provided.");
                 return BadRequest("At least one filter must be provided.");
-            }
+            }   
 
             // Витягуємо ID користувача з токена
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -93,6 +99,12 @@ namespace TaskTracker.Controllers
             {
                 query = query.Where(t => filter.Statuses.Contains(t.Status));
                 _logger.LogInformation("Filtering by statuses: {Statuses}", string.Join(", ", filter.Statuses.Select(s => s.ToString())));
+            }
+
+            if (filter.Limit.HasValue)
+            {
+                query = query.Take(filter.Limit.Value);
+                _logger.LogInformation("Limiting results to: {Limit}", filter.Limit.Value);
             }
 
             // Додає фільтрацію за датою створення, якщо вона передана

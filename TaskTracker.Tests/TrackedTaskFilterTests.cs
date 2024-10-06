@@ -118,7 +118,7 @@ namespace TaskTracker.Tests
             SeedTasks();
 
             var filterDto = new TaskFilterDto { CreatedAfter = DateTime.UtcNow.AddDays(-2) };
-            var result = _controller.FilterTrackedTasks(filterDto);
+            var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
@@ -168,6 +168,16 @@ namespace TaskTracker.Tests
         {
             // Arrange
             SeedTasks();
+
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.NameIdentifier, "1") // User's mock
+            };
+            var user = new ClaimsPrincipal(new  ClaimsIdentity(claims, "TestAuthType"));
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User  = user }   
+            };
 
             var filterDto = new TaskFilterDto 
             {
@@ -231,7 +241,7 @@ namespace TaskTracker.Tests
             var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
-            Assert.IsType<BadRequestResult>(result.Result);
+            Assert.IsType<BadRequestObjectResult>(result.Result);
         }
 
         [Fact]
