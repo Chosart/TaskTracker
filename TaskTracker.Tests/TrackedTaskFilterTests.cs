@@ -168,28 +168,7 @@ namespace TaskTracker.Tests
             var filterDto = new TaskFilterDto 
             {
                 Status = "NonExistentStatus",
-                Priority = null,
-                UserId = null,
-                CreatedAfter = null,
-                CreatedBefore = null,
-                Statuses = new  List<string>()
-
-            };
-
-            // Mocking the User and the database context
-            var mockUser = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, "1") // приклад ID користувача
-            }));
-
-            // Configure the mock context and controller
-            var context = new Mock<TaskTrackerContext>();
-            var controller = new TrackedTaskController(context.Object)
-            {
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = new DefaultHttpContext { User = mockUser }
-                }
+                Statuses = null
             };
 
             // Act
@@ -197,7 +176,6 @@ namespace TaskTracker.Tests
 
             // Assert 
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
-            var okResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
 
             Assert.Empty(tasks);

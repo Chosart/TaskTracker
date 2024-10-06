@@ -74,9 +74,9 @@ namespace TaskTracker.Controllers
             }
 
             // Додаємо фільтрацію за користувачем
-            if (userId != null)
+            if (filter.UserId.HasValue)
             {
-                query = query.Where(t => t.UserId.ToString() == userId);
+                query = query.Where(t => t.UserId == filter.UserId.Value);
             }
 
             // Додаємо фільтрацію за користувачами
