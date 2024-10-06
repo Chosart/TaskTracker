@@ -15,10 +15,12 @@ namespace TaskTracker.Controllers
     public class TrackedTaskController : ControllerBase
     {
         private readonly TaskTrackerContext _context;
+        private readonly ILogger<TrackedTaskController> _logger;
 
-        public TrackedTaskController(TaskTrackerContext context)
+        public TrackedTaskController(TaskTrackerContext context, ILogger<TrackedTaskController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]

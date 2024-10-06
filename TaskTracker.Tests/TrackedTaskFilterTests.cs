@@ -167,8 +167,7 @@ namespace TaskTracker.Tests
 
             var filterDto = new TaskFilterDto 
             {
-                Status = "NonExistentStatus",
-                Statuses = null
+                Status = "NonExistentStatus"
             };
 
             // Act
