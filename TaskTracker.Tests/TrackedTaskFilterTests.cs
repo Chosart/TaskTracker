@@ -34,7 +34,7 @@ namespace TaskTracker.Tests
             // Створення мокового логгера
             var loggerMock = new Mock<ILogger<TrackedTaskController>>();
 
-            _controller = new TrackedTaskController(_context, loggerMock.Object);   
+            _controller = new TrackedTaskController(_context, loggerMock.Object);
 
             // Очищення бази даних перед тестами
             _context.Database.EnsureDeleted();
@@ -81,7 +81,7 @@ namespace TaskTracker.Tests
         public async Task FilterTrackedTasks_ByStatus_ReturnsFilteredTasks()
         {
             // Arrange
-            SeedTasks(); // Сіюємо задачі перед тестуванням
+            SeedTasks();
 
             var filterDto = new TaskFilterDto { Status = "Open" };
             var result = await _controller.FilterTrackedTasks(filterDto);
@@ -141,6 +141,7 @@ namespace TaskTracker.Tests
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
             var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
 
+            Assert.NotNull(tasks);
             Assert.Equal(2, tasks.Count); // Має бути 2 задачі, створені до 1 дня тому
             Assert.Contains(tasks, task => task.Title == "Task 1");
             Assert.Contains(tasks, task => task.Title == "Task 3");
@@ -167,31 +168,22 @@ namespace TaskTracker.Tests
         public async Task FilterTrackedTasks_NoMatchingStatus_ReturnsEmptyList()
         {
             // Arrange
-            SeedTasks();
+            SeedTasks()
 
-            var claims = new List<Claim>()
+            var filterDto = new TaskFilterDto
             {
-                new Claim(ClaimTypes.NameIdentifier, "1") // User's mock
-            };
-            var user = new ClaimsPrincipal(new  ClaimsIdentity(claims, "TestAuthType"));
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext { User  = user }   
-            };
-
-            var filterDto = new TaskFilterDto 
-            {
-                Status = "NonExistentStatus"
+                Status = "NonExistentStatus" // Статус, який не існує
             };
 
             // Act
             var result = await _controller.FilterTrackedTasks(filterDto);
 
-            // Assert 
+            // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
-            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value); // Перевіряємо, що Value не null
 
-            Assert.Empty(tasks);
+            Assert.NotNull(actionResult.Value); // Перевірка на null
+            Assert.Empty(tasks); // Перевіряємо, що список задач пустий
         }
 
         [Fact]
@@ -207,7 +199,7 @@ namespace TaskTracker.Tests
             task.Priority = "Medium";
 
             // Act
-            var result = await _controller.UpdateTrackedTask(task.Id, task);    
+            var result = await _controller.UpdateTrackedTask(task.Id, task);
 
             // Assert
             Assert.IsType<NoContentResult>(result);
@@ -222,7 +214,7 @@ namespace TaskTracker.Tests
             SeedTasks();
 
             var filterDto = new TaskFilterDto { UserId = 1 }; // Фільтрація за UserId
-            var result =  await _controller.FilterTrackedTasks(filterDto);
+            var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
@@ -317,7 +309,7 @@ namespace TaskTracker.Tests
             var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);   
+            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
             var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
 
             Assert.Empty(tasks);
@@ -340,8 +332,7 @@ namespace TaskTracker.Tests
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
             var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
 
-            Assert.Empty(tasks);
-            Assert.Equal("Task 3", tasks[0].Title);
+            Assert.Equal(3, tasks.Count); // Має повернути 3 задачі
         }
 
         [Fact]
