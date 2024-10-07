@@ -48,7 +48,7 @@ namespace TaskTracker.Controllers
              var nullCheckResult = CheckForNull(filter, "Filter cannot be null.");
             if (nullCheckResult != null) return nullCheckResult;
 
-            // Перевірка на null для Status
+            // Перевірка на null для Status та Status
             if (string.IsNullOrEmpty(filter.Status) && filter.Statuses == null)
             {
                 return BadRequest("At least one status must be provided.");
@@ -119,6 +119,9 @@ namespace TaskTracker.Controllers
             {
                 return new ActionResult<IEnumerable<TrackedTask>>(new List<TrackedTask>());
             }
+
+            // Логування кількості знайдених задач
+            _logger.LogInformation($"Found {tasks.Count} tasks.");
 
             return Ok(tasks);
         }
