@@ -108,9 +108,14 @@ namespace TaskTracker.Controllers
                 query = query.Take(filter.Limit.Value);
             }
 
+            // Логіка для повернення порожнього списку
             var tasks = await query.ToListAsync();
+            if (!tasks.Any())
+            {
+                return new ActionResult<IEnumerable<TrackedTask>>(new List<TrackedTask>());
+            }
 
-            return Ok(tasks ?? new List<TrackedTask>());
+            return Ok(tasks);
         }
 
         [HttpPost]
