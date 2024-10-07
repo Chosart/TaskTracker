@@ -44,7 +44,7 @@ namespace TaskTracker.Controllers
         [HttpGet("filter")]
         public async Task<ActionResult<IEnumerable<TrackedTask>>> FilterTrackedTasks([FromQuery] TaskFilterDto filter)
         {
-            if (filter == null)
+            if (filter == null || string.IsNullOrEmpty(filter.Status))
             {
                 _logger.LogWarning("Filter is null.");
                 return BadRequest("Filter cannot be null.");

@@ -229,7 +229,8 @@ namespace TaskTracker.Tests
             var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
-            Assert.IsType<BadRequestObjectResult>(result.Result);
+            var BadRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Filter cannot be null.", BadRequestResult.Value);
         }
 
         [Fact]
