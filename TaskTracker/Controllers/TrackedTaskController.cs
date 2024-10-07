@@ -44,10 +44,14 @@ namespace TaskTracker.Controllers
         [HttpGet("filter")]
         public async Task<ActionResult<IEnumerable<TrackedTask>>> FilterTrackedTasks([FromQuery] TaskFilterDto filter)
         {
-            if (filter == null || string.IsNullOrEmpty(filter.Status))
+             // Перевірка null на для filter
+             var nullCheckResult = CheckForNull(filter, "Filter cannot be null.");
+            if (nullCheckResult != null) return nullCheckResult;
+
+            // Перевірка на null для Status
+            if (string.IsNullOrEmpty(filter.Status) && filter.Statuses == null)
             {
-                _logger.LogWarning("Filter is null.");
-                return BadRequest("Filter cannot be null.");
+                return BadRequest("At least one status must be provided.");
             }
 
             // Перевірка дат
@@ -110,7 +114,8 @@ namespace TaskTracker.Controllers
 
             // Логіка для повернення порожнього списку
             var tasks = await query.ToListAsync();
-            if (!tasks.Any())
+
+            if (tasks == null || !tasks.Any())
             {
                 return new ActionResult<IEnumerable<TrackedTask>>(new List<TrackedTask>());
             }
@@ -208,6 +213,15 @@ namespace TaskTracker.Controllers
         private bool trackedTaskExists(int id)
         {
             return _context.TrackedTasks.Any(e => e.Id == id);
+        }
+
+        private ActionResult CheckForNull(object obj, string errorMessage)
+        {
+            if (obj == null)
+            {
+                return BadRequest(errorMessage);
+            }
+            return null;
         }
     }
 }
