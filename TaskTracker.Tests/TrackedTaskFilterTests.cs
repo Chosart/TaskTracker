@@ -353,14 +353,14 @@ namespace TaskTracker.Tests
             // Arrange
             var filter = new TaskFilterDto
             {
-                CreatedAfter = new DateTime(10000, 1, 1)
+                CreatedAfter = new DateTime(9999, 12, 31)
             };
 
             // Act
             var result = await _controller.FilterTrackedTasks(filter);
 
             // Assert
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
             Assert.Equal("CreatedAfter date is out of range.", badRequestResult.Value);
         }
 
