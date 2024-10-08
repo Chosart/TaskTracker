@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
 using Moq;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -105,10 +106,18 @@ namespace TaskTracker.Tests
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
-            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
 
-            Assert.Single(tasks);
-            Assert.Equal("Task 1", tasks[0].Title);
+            if (actionResult.Result is BadRequestObjectResult badRequest)
+            {
+                Assert.NotNull(badRequest.Value);
+                throw new Exception("BadRequest:" + badRequest.Value);
+            }
+
+            var tasks = actionResult.Value.ToList(); // Перетворення в список
+
+            Assert.NotNull(tasks); // Переконайтеся, що tasks не null
+            Assert.Single(tasks); // Тут перевіряємо, що є одна задача
+            Assert.Equal("Task 1", tasks[0].Title); // Тепер це працює
         }
 
         [Fact]
