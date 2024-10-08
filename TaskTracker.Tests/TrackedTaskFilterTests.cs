@@ -107,17 +107,12 @@ namespace TaskTracker.Tests
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
 
-            if (actionResult.Result is BadRequestObjectResult badRequest)
-            {
-                Assert.NotNull(badRequest.Value);
-                throw new Exception("BadRequest:" + badRequest.Value);
-            }
-
-            var tasks = actionResult.Value.ToList(); // Перетворення в список
+            Assert.NotNull(actionResult.Value);
+            var tasks = actionResult.Value?.ToList(); 
 
             Assert.NotNull(tasks); // Переконайтеся, що tasks не null
             Assert.Single(tasks); // Тут перевіряємо, що є одна задача
-            Assert.Equal("Task 1", tasks[0].Title); // Тепер це працює
+            Assert.Equal("Task 1", tasks[0].Title); // Перевіряємо, що це правильна задача
         }
 
         [Fact]

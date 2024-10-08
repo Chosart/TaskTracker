@@ -44,8 +44,8 @@ namespace TaskTracker.Controllers
         [HttpGet("filter")]
         public async Task<ActionResult<IEnumerable<TrackedTask>>> FilterTrackedTasks([FromQuery] TaskFilterDto filter)
         {
-             // Перевірка null на для filter
-             var nullCheckResult = CheckForNull(filter, "Filter cannot be null.");
+            // Перевірка null на для filter
+            var nullCheckResult = CheckForNull(filter, "Filter cannot be null.");
             if (nullCheckResult != null) return nullCheckResult;
 
             // Перевірка на null для Status та Status
@@ -57,14 +57,14 @@ namespace TaskTracker.Controllers
             // Перевірка дат
             if (filter.CreatedAfter.HasValue
                 && (filter.CreatedAfter.Value < new DateTime(1, 1, 1)
-                || filter.CreatedAfter.Value > new DateTime(9999, 12, 31)))
+                || filter.CreatedAfter.Value > DateTime.MaxValue))
             {
                 return BadRequest("CreatedAfter date is out of range.");
             }
 
             if (filter.CreatedBefore.HasValue
                 && (filter.CreatedBefore.Value < new DateTime(1, 1, 1)
-                || filter.CreatedBefore.Value > new DateTime(9999, 12, 31)))
+                || filter.CreatedBefore.Value > DateTime.MaxValue))
             {
                 return BadRequest("CreatedBefore date is out of range.");
             }
