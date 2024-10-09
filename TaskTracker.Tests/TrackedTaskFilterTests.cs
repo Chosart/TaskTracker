@@ -78,21 +78,33 @@ namespace TaskTracker.Tests
             _context.SaveChanges();
         }
 
-        [Fact]
-        public async Task FilterTrackedTasks_ByStatus_ReturnsFilteredTasks()
+        [Theory]
+        [InlineData("Open", 1)]
+        [InlineData("In Progress", 1)]
+        [InlineData("Closed", 1)]
+        [InlineData("Nonexistent", 0)]
+        public void FilterTrackedTasks_ByStatus_ReturnsFilteredTasks(string status, int expectedCount)
         {
             // Arrange
-            SeedTasks();
+            var tasks = new List<TrackedTask>
+            {
+                new TrackedTask { Status = "Open" },
+                new TrackedTask { Status = "In Progress" },
+                new TrackedTask { Status = "Closed" }
+            };
 
-            var filterDto = new TaskFilterDto { Status = "Open" };
-            var result = await _controller.FilterTrackedTasks(filterDto);
+            var filterDto = new TaskFilterDto();
+
+            // Act
+            var result = filterDto.FilterTrackedTasks(tasks, null, status); // Передаємо null для priority
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
-            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+            Assert.Equal(expectedCount, result.Count);
 
-            Assert.Equal(2, tasks.Count); // Має бути 2 відкриті задачі
-            Assert.All(tasks, task => Assert.Equal("Open", task.Status));
+            if (expectedCount > 0)
+            {
+                Assert.All(result, task => Assert.Equal(status, task.Status)); // Перевірка статусу
+            }
         }
 
         [Theory]
@@ -112,7 +124,7 @@ namespace TaskTracker.Tests
             var filterDto = new TaskFilterDto();
 
             // Act
-            var result = filterDto.FilterTrackedTasks(tasks, priority);
+            var result = filterDto.FilterTrackedTasks(tasks, priority, null);
 
             // Assert
             Assert.NotNull(result);
