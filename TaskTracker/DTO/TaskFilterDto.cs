@@ -10,5 +10,7 @@
         public List<string> Statuses { get; set; } = new();
         public int? UserId { get; set; }
 
+
+
     }
 }

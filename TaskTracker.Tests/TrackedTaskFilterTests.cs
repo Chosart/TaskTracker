@@ -95,24 +95,29 @@ namespace TaskTracker.Tests
             Assert.All(tasks, task => Assert.Equal("Open", task.Status));
         }
 
-        [Fact]
-        public async Task FilterTrackedTasks_ByPriority_ReturnsFilteredTasks()
+        [Theory]
+        [InlineData(1, "High")]
+        [InlineData(2, "Medium")]
+        [InlineData(3, "Low")]
+        public void FilterTrackedTasks_ByPriority_ReturnsCorrectTasks(int priority, string expectedPriority)
         {
             // Arrange
-            SeedTasks();
+            var tasks = new List<TrackedTask>
+            {
+                new TrackedTask { Priority = "High", Title = "Task 1" },
+                new TrackedTask { Priority = "Medium", Title = "Task 2" },
+                new TrackedTask { Priority = "Low", Title = "Task 3" }
+            };
 
-            var filterDto = new TaskFilterDto { Priority = "High" };
-            var result = await _controller.FilterTrackedTasks(filterDto);
+            var filterDto = new TaskFilterDto();
+
+            // Act
+            var result = filterDto.FilterTrackedTasks(tasks, priority);
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
-
-            Assert.NotNull(actionResult.Value);
-            var tasks = actionResult.Value?.ToList(); 
-
-            Assert.NotNull(tasks); // Переконайтеся, що tasks не null
-            Assert.Single(tasks); // Тут перевіряємо, що є одна задача
-            Assert.Equal("Task 1", tasks[0].Title); // Перевіряємо, що це правильна задача
+            Assert.NotNull(result);
+            Assert.Single(result);
+            Assert.Equal(expectedPriority, result.First().Priority);
         }
 
         [Fact]
