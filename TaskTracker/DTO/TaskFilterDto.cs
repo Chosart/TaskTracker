@@ -14,6 +14,12 @@ namespace TaskTracker.DTO
 
         public List<TrackedTask> FilterTrackedTasks(List<TrackedTask> tasks, int? priority, string? status)
         {
+            // Фільтрація за статусами
+            if (Statuses != null && Statuses.Any())
+            {
+                tasks = tasks.Where(task => Statuses.Contains(task.Status)).ToList();
+            }
+
             // Фільтрація за статусом
             if (!string.IsNullOrEmpty(status))
             {
@@ -34,7 +40,13 @@ namespace TaskTracker.DTO
                 tasks = tasks.Where(task => task.Priority == priorityString).ToList();
             }
 
-            return tasks;
+            // Застосування ліміту
+            if (Limit.HasValue && Limit.Value > 0)
+            {
+                tasks = tasks.Take(Limit.Value).ToList();
+            }
+
+            return tasks ?? new List<TrackedTask>();
         }
     }
 }

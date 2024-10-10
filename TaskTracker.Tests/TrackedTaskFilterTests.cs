@@ -353,20 +353,29 @@ namespace TaskTracker.Tests
             }
         }
 
-        [Fact]
-        public async Task FilterTrackedTask_LimitResults_ReturnsLimitedTasks()
+        [Theory]
+        [InlineData(2)] // Тестуємо з лімітом 2
+        public async Task FilterTrackedTasks_LimitResults_ReturnsLimitedTasks(int limit)
         {
-            // Arrange 
-            SeedTasks();
+            // Arrange
+            var tasks = new List<TrackedTask>
+            {
+                new TrackedTask { Status = "Open", Priority = "High", Title = "Task 1", Description = "Description 1" },
+                new TrackedTask { Status = "In Progress", Priority = "Medium", Title = "Task 2", Description = "Description 2" },
+                new TrackedTask { Status = "Closed", Priority = "Low", Title = "Task 3", Description = "Description 3" }
+            };
 
-            var filterDto = new TaskFilterDto { Limit = 2 };
-            var result = await _controller.FilterTrackedTasks(filterDto);
+            _context.TrackedTasks.AddRange(tasks);
+            await _context.SaveChangesAsync();
+
+            var filterDto = new TaskFilterDto { Limit = limit };
+
+            // Act
+            var filteredTasks = filterDto.FilterTrackedTasks(tasks, null, null); // Передаємо null для status
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
-            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
-
-            Assert.Equal(2, tasks.Count);
+            Assert.NotNull(filteredTasks); // Перевіряємо, що результат не null
+            Assert.Equal(limit, filteredTasks.Count); // Перевіряємо, що кількість задач відповідає ліміту
         }
 
         [Fact]
