@@ -254,20 +254,39 @@ namespace TaskTracker.Tests
             Assert.Equal("Filter cannot be null.", BadRequestResult.Value);
         }
 
-        [Fact]
-        public async Task FilterTrackedTasks_MultipleFilters_ReturnsCorrectTasks()
+        [Theory]
+        [InlineData("Open", 1)]
+        [InlineData("In Progress", 1)]
+        [InlineData("Closed", 1)]
+        [InlineData("Nonexistent", 0)]
+        public async Task FilterTrackedTasks_MultipleFilters_ReturnsCorrectTasks(string status, int expectedCount) 
         {
             // Arrange
-            SeedTasks();
-            var filterDto = new TaskFilterDto { Status = "Open", Priority = "High" };
-            var result = await _controller.FilterTrackedTasks(filterDto);
+            var tasks = new List<TrackedTask>
+            {
+                new TrackedTask { Status = "Open", Priority = "High", Title = "Task 1", Description = "Description 1" },
+                new TrackedTask { Status = "In Progress", Priority = "Medium", Title = "Task 2", Description = "Description 2" },
+                new TrackedTask { Status = "Closed", Priority = "Low", Title = "Task 3", Description = "Description 3" }
+            };
+
+            _context.TrackedTasks.AddRange(tasks);
+            await _context.SaveChangesAsync();
+
+            var filterDto = new TaskFilterDto
+            {
+                Statuses = new List<string> { "Open", "In Progress", "Closed" } // Вказуємо кілька статусів
+            };
+
+            // Act
+            var filteredTasks = filterDto.FilterTrackedTasks(tasks, null, status);
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
-            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+            Assert.Equal(expectedCount, filteredTasks.Count);
 
-            Assert.Single(tasks);
-            Assert.Equal("Task 1", tasks[0].Title);
+            if (expectedCount > 0)
+            {
+                Assert.All(filteredTasks, task => Assert.Equal(status, task.Status));
+            }
         }
 
         [Theory]
