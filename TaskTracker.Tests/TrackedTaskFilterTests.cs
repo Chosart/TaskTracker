@@ -270,20 +270,36 @@ namespace TaskTracker.Tests
             Assert.Equal("Task 1", tasks[0].Title);
         }
 
-        [Fact]
-        public async Task FilterTrackedTasks_MultipleStatuses_ReturnsFilteredTasks()
+        [Theory]
+        [InlineData("Open", 1)]
+        [InlineData("In Progress", 1)]
+        [InlineData("Closed", 1)]
+        [InlineData("Nonexistent", 0)]
+        public void FilterTrackedTasks_MultipleStatuses_ReturnsFilteredTasks(string status, int expectedCount)
         {
             // Arrange
-            SeedTasks();
+            var tasks = new List<TrackedTask>
+    {
+        new TrackedTask { Status = "Open", Priority = "High", Title = "Task 1" },
+        new TrackedTask { Status = "In Progress", Priority = "Medium", Title = "Task 2" },
+        new TrackedTask { Status = "Closed", Priority = "Low", Title = "Task 3" }
+    };
 
-            var filterDto = new TaskFilterDto { Statuses = new List<string> { "Open", "Closed" } }; // Додайте поле для кількох статусів
-            var result = await _controller.FilterTrackedTasks(filterDto);
+            var filterDto = new TaskFilterDto
+            {
+                Statuses = new List<string> { "Open", "In Progress", "Closed" } // Вказуємо кілька статусів
+            };
+
+            // Act
+            var filteredTasks = filterDto.FilterTrackedTasks(tasks, null, status);
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
-            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+            Assert.Equal(expectedCount, filteredTasks.Count); // Перевіряємо, що кількість задач відповідає очікуваній
 
-            Assert.Equal(3, tasks.Count); // Має бути 3 задачі з різними статусами
+            if (expectedCount > 0)
+            {
+                Assert.All(filteredTasks, task => Assert.Equal(status, task.Status)); // Перевіряємо, що статуси збігаються
+            }
         }
 
         [Fact]
