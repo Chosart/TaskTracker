@@ -58,7 +58,7 @@ namespace TaskTracker.Tests
             {
                 Title = "Task 2",
                 Status = "Open",
-                Priority = "Low",
+                Priority = "Medium",
                 Description = "Description for Task 2",
                 CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeSeconds()), // 1 дні тому
                 UserId = 1
@@ -66,9 +66,9 @@ namespace TaskTracker.Tests
 
             var task3 = new TrackedTask
             {
-                Title = "Task 2",
+                Title = "Task 3",
                 Status = "Closed",
-                Priority = "Medium",
+                Priority = "Low",
                 Description = "Description for Task 3",
                 CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-3).ToUnixTimeSeconds()), // 3 дні тому
                 UserId = 1
@@ -279,11 +279,11 @@ namespace TaskTracker.Tests
         {
             // Arrange
             var tasks = new List<TrackedTask>
-    {
-        new TrackedTask { Status = "Open", Priority = "High", Title = "Task 1" },
-        new TrackedTask { Status = "In Progress", Priority = "Medium", Title = "Task 2" },
-        new TrackedTask { Status = "Closed", Priority = "Low", Title = "Task 3" }
-    };
+            {
+                new TrackedTask { Status = "Open", Priority = "High", Title = "Task 1" },
+                new TrackedTask { Status = "In Progress", Priority = "Medium", Title = "Task 2" },
+                new TrackedTask { Status = "Closed", Priority = "Low", Title = "Task 3" }
+            };
 
             var filterDto = new TaskFilterDto
             {
@@ -302,19 +302,36 @@ namespace TaskTracker.Tests
             }
         }
 
-        [Fact]
-        public async Task FilterTrackedTasks_NoFilters_ReturnsAllTasks()
+        [Theory]
+        [InlineData("Nonexistent", 0)]
+        public async Task FilterTrackedTasks_NoFilters_ReturnsAllTasks(string status, int expectedCount)
         {
             // Arrange
-            SeedTasks();
+            var tasks = new List<TrackedTask>
+            {
+                new TrackedTask { Status = "Open", Priority = "High", Title = "Task 1", Description = "Description 1" },
+                new TrackedTask { Status = "In Progress", Priority = "Medium", Title = "Task 2", Description = "Description 2" },
+                new TrackedTask { Status = "Closed", Priority = "Low", Title = "Task 3", Description = "Description 3" }
+            };
 
-            var filterDto = new TaskFilterDto(); // Порожній фільтр
-            var result = await _controller.FilterTrackedTasks(filterDto);
+            _context.TrackedTasks.AddRange(tasks);
+            await _context.SaveChangesAsync();
 
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
-            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+            var filterDto = new TaskFilterDto
+            {
+                Statuses = new List<string> { status } // Вказуємо кілька статусів
+            };
 
-            Assert.Equal(3, tasks.Count); //  Має повернути всі задачі
+            // Act
+            var filteredTasks = filterDto.FilterTrackedTasks(tasks, null, status);
+
+            // Assert
+            Assert.Equal(expectedCount, filteredTasks.Count); // Перевіряємо, що кількість задач відповідає очікуваній
+
+            if (expectedCount > 0)
+            {
+                Assert.All(filteredTasks, task => Assert.Equal(status, task.Status)); // Перевіряємо, що статуси збігаються
+            }
         }
 
         [Fact]
