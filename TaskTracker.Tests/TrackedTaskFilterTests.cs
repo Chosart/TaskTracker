@@ -148,24 +148,61 @@ namespace TaskTracker.Tests
             Assert.Equal(2, tasks.Count); // Має бути 2 задачі, створені після 2 днів тому
         }
 
-        [Fact]
-        public async Task FilterTrackedTasks_ByCreatedBefore_ReturnsFilteredTasks()
+        [Theory]
+        [InlineData(-1)]
+        public async Task FilterTrackedTasks_ByCreatedBefore_ReturnsFilteredTasks(int daysBefore)
         {
             // Arrange
-            SeedTasks();
+            var tasks = new List<TrackedTask>
+            {
+                new TrackedTask
+                {
+                    Title = "Task 1",
+                    Description = "Description for Task 1",
+                    CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-2).ToUnixTimeSeconds()),
+                    Priority = "High",
+                    Status = "Open"
+                },
+                new TrackedTask
+                {
+                    Title = "Task 2",
+                    Description = "Description for Task 2",
+                    CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeSeconds()),
+                    Priority = "Medium",
+                    Status = "Open"
+                },
+                new TrackedTask 
+                {
+                    Title = "Task 3",
+                    Description = "Description for Task 3",
+                    CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-3).ToUnixTimeSeconds()),
+                    Priority = "Low",
+                    Status = "Closed"
+                }
+            };
 
-            // Створюємо дату, до якої будемо фільтрувати
-            var filterDto = new TaskFilterDto { CreatedBefore = DateTime.UtcNow.AddDays(-1) };
+            // Додаємо задачі до контексту
+            await _context.TrackedTasks.AddRangeAsync(tasks);
+            await _context.SaveChangesAsync();
+
+            // Створюємо фільтр
+            var filterDto = new TaskFilterDto
+            {
+                CreatedBefore = DateTime.UtcNow.AddDays(daysBefore)
+            };
+
+            // Act
             var result = await _controller.FilterTrackedTasks(filterDto);
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
-            var tasks = Assert.IsType<List<TrackedTask>>(actionResult.Value);
+            var filteredTasks = actionResult.Value; // Може бути null
 
-            Assert.NotNull(tasks);
-            Assert.Equal(2, tasks.Count); // Має бути 2 задачі, створені до 1 дня тому
-            Assert.Contains(tasks, task => task.Title == "Task 1");
-            Assert.Contains(tasks, task => task.Title == "Task 3");
+            Assert.NotNull(filteredTasks); // Переконуємося, що не null
+            Assert.IsAssignableFrom<IEnumerable<TrackedTask>>(filteredTasks); // Перевірка типу
+            Assert.Equal(2, filteredTasks.Count()); // Має бути 2 задачі
+            Assert.Contains(filteredTasks, task => task.Title == "Task 1");
+            Assert.Contains(filteredTasks, task => task.Title == "Task 3");
         }
 
         [Fact]

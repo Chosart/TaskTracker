@@ -71,6 +71,8 @@ namespace TaskTracker.Controllers
 
             var query = _context.TrackedTasks.AsQueryable();
 
+            _logger.LogInformation($"Starting filtering with CreatedBefore: {filter.CreatedBefore}");
+
             // Додати фільтрацію за статусом, якщо він переданий
             if (!string.IsNullOrEmpty(filter.Status))
             {
@@ -103,7 +105,8 @@ namespace TaskTracker.Controllers
 
             if (filter.CreatedBefore.HasValue)
             {
-                query = query.Where(t => t.CreatedAt <= ((DateTimeOffset)filter.CreatedBefore.Value).ToUnixTimeSeconds());
+                var createdBeforeUnix = ((DateTimeOffset)filter.CreatedBefore.Value).ToUnixTimeSeconds();
+                query = query.Where(t => t.CreatedAt <= createdBeforeUnix);
             }
 
             // Обмежити результати, якщо задано
@@ -120,8 +123,8 @@ namespace TaskTracker.Controllers
                 return new ActionResult<IEnumerable<TrackedTask>>(new List<TrackedTask>());
             }
 
-            // Логування кількості знайдених задач
-            _logger.LogInformation($"Found {tasks.Count} tasks.");
+            // Логування результатів
+            _logger.LogInformation($"Found {tasks.Count} tasks after filtering.");
 
             return Ok(tasks);
         }

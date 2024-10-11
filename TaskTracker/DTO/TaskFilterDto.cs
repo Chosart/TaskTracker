@@ -1,4 +1,5 @@
 ﻿using TaskTracker.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace TaskTracker.DTO
 {
@@ -44,6 +45,12 @@ namespace TaskTracker.DTO
             if (Limit.HasValue && Limit.Value > 0)
             {
                 tasks = tasks.Take(Limit.Value).ToList();
+            }
+
+            if (CreatedBefore.HasValue)
+            {
+                var createdBeforeUnix = ((DateTimeOffset)CreatedBefore.Value).ToUnixTimeSeconds();
+                tasks = tasks.Where(task => task.CreatedAt <= createdBeforeUnix).ToList();
             }
 
             return tasks ?? new List<TrackedTask>();
