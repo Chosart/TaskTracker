@@ -149,38 +149,39 @@ namespace TaskTracker.Tests
         }
 
         [Theory]
-        [InlineData(-1)]
+        [InlineData(-1)] // Фільтрація задач, створених до поточної дати
         public async Task FilterTrackedTasks_ByCreatedBefore_ReturnsFilteredTasks(int daysBefore)
         {
             // Arrange
             var tasks = new List<TrackedTask>
-    {
-        new TrackedTask
-        {
-            Title = "Task 1",
-            Description = "Description for Task 1",
-            CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-2).ToUnixTimeSeconds()),
-            Priority = "High",
-            Status = "Open"
-        },
-        new TrackedTask
-        {
-            Title = "Task 2",
-            Description = "Description for Task 2",
-            CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeSeconds()),
-            Priority = "Medium",
-            Status = "Open"
-        },
-        new TrackedTask
-        {
-            Title = "Task 3",
-            Description = "Description for Task 3",
-            CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-3).ToUnixTimeSeconds()),
-            Priority = "Low",
-            Status = "Closed"
-        }
-    };
+            {
+                new TrackedTask
+                {
+                    Title = "Task 1",
+                    Description = "Description for Task 1",
+                    CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-2).ToUnixTimeSeconds()), // 2 дні тому
+                    Priority = "High",
+                    Status = "Open"
+                },
+                new TrackedTask
+                {
+                    Title = "Task 2",
+                    Description = "Description for Task 2",
+                    CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeSeconds()), // 1 день тому
+                    Priority = "Medium",
+                    Status = "Open"
+                },
+                new TrackedTask
+                {
+                    Title = "Task 3",
+                    Description = "Description for Task 3",
+                    CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-3).ToUnixTimeSeconds()), // 3 дні тому
+                    Priority = "Low",
+                    Status = "Closed"
+                }
+            };
 
+            // Додаємо задачі до контексту
             await _context.TrackedTasks.AddRangeAsync(tasks);
             await _context.SaveChangesAsync();
 
@@ -197,11 +198,9 @@ namespace TaskTracker.Tests
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
             var filteredTasks = actionResult.Value;
 
+            // Перевірка
             Assert.NotNull(filteredTasks);
-            Assert.IsAssignableFrom<IEnumerable<TrackedTask>>(filteredTasks);
             Assert.Equal(2, filteredTasks.Count());
-
-            // Перевіряємо наявність конкретних задач
             Assert.Contains(filteredTasks, task => task.Title == "Task 1");
             Assert.Contains(filteredTasks, task => task.Title == "Task 3");
         }

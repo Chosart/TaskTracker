@@ -98,7 +98,7 @@ namespace TaskTracker.Controllers
 
             var tasks = await query.ToListAsync();
 
-            return tasks.Any() ? Ok(tasks) : new ActionResult<IEnumerable<TrackedTask>>(new List<TrackedTask>());
+            return tasks.Any() ? Ok(tasks) : Ok(new List<TrackedTask>()); // Змінено на Ok
         }
 
         [HttpPost]
