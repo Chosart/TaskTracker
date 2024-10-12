@@ -44,6 +44,7 @@ namespace TaskTracker.Tests
                 Description = "Test Description",
                 IsCompleted = false,
                 Priority = "High",
+                Status = "Open",
                 CreatedAt = 1234567890,
                 UserId = 1
             };
@@ -108,6 +109,7 @@ namespace TaskTracker.Tests
             {
                 Id = 1,
                 Title = "Original Title",
+                Status = "Open",
                 Description = "Original Description",
                 IsCompleted = false,
                 Priority = "High",
@@ -124,6 +126,7 @@ namespace TaskTracker.Tests
             {
                 Id = trackedTask.Id, // Вказуємо правильний ID
                 Title = "Update Title",
+                Status = "Open",
                 Description = "Update Description",
                 IsCompleted = true, // Ставимо true для IsCompleted
                 Priority = "Low",
@@ -182,6 +185,7 @@ namespace TaskTracker.Tests
             var trackedTask = new TrackedTask
             {
                 Title = "Task to Delete",
+                Status = "Closed",
                 Description = "Description",
                 IsCompleted = false,
                 Priority = "Low",
