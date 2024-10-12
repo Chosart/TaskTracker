@@ -154,34 +154,33 @@ namespace TaskTracker.Tests
         {
             // Arrange
             var tasks = new List<TrackedTask>
-            {
-                new TrackedTask
-                {
-                    Title = "Task 1",
-                    Description = "Description for Task 1",
-                    CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-2).ToUnixTimeSeconds()),
-                    Priority = "High",
-                    Status = "Open"
-                },
-                new TrackedTask
-                {
-                    Title = "Task 2",
-                    Description = "Description for Task 2",
-                    CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeSeconds()),
-                    Priority = "Medium",
-                    Status = "Open"
-                },
-                new TrackedTask 
-                {
-                    Title = "Task 3",
-                    Description = "Description for Task 3",
-                    CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-3).ToUnixTimeSeconds()),
-                    Priority = "Low",
-                    Status = "Closed"
-                }
-            };
+    {
+        new TrackedTask
+        {
+            Title = "Task 1",
+            Description = "Description for Task 1",
+            CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-2).ToUnixTimeSeconds()),
+            Priority = "High",
+            Status = "Open"
+        },
+        new TrackedTask
+        {
+            Title = "Task 2",
+            Description = "Description for Task 2",
+            CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeSeconds()),
+            Priority = "Medium",
+            Status = "Open"
+        },
+        new TrackedTask
+        {
+            Title = "Task 3",
+            Description = "Description for Task 3",
+            CreatedAt = (int)(DateTimeOffset.UtcNow.AddDays(-3).ToUnixTimeSeconds()),
+            Priority = "Low",
+            Status = "Closed"
+        }
+    };
 
-            // Додаємо задачі до контексту
             await _context.TrackedTasks.AddRangeAsync(tasks);
             await _context.SaveChangesAsync();
 
@@ -196,11 +195,13 @@ namespace TaskTracker.Tests
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);
-            var filteredTasks = actionResult.Value; // Може бути null
+            var filteredTasks = actionResult.Value;
 
-            Assert.NotNull(filteredTasks); // Переконуємося, що не null
-            Assert.IsAssignableFrom<IEnumerable<TrackedTask>>(filteredTasks); // Перевірка типу
-            Assert.Equal(2, filteredTasks.Count()); // Має бути 2 задачі
+            Assert.NotNull(filteredTasks);
+            Assert.IsAssignableFrom<IEnumerable<TrackedTask>>(filteredTasks);
+            Assert.Equal(2, filteredTasks.Count());
+
+            // Перевіряємо наявність конкретних задач
             Assert.Contains(filteredTasks, task => task.Title == "Task 1");
             Assert.Contains(filteredTasks, task => task.Title == "Task 3");
         }

@@ -44,63 +44,45 @@ namespace TaskTracker.Controllers
         [HttpGet("filter")]
         public async Task<ActionResult<IEnumerable<TrackedTask>>> FilterTrackedTasks([FromQuery] TaskFilterDto filter)
         {
-            // Перевірка null на для filter
             var nullCheckResult = CheckForNull(filter, "Filter cannot be null.");
             if (nullCheckResult != null) return nullCheckResult;
 
-            // Перевірка на null для Status та Status
+            if (filter.CreatedAfter.HasValue && filter.CreatedBefore.HasValue && filter.CreatedAfter > filter.CreatedBefore)
+            {
+                return BadRequest("CreatedAfter must be earlier than CreatedBefore.");
+            }
+
             if (string.IsNullOrEmpty(filter.Status) && filter.Statuses == null)
             {
                 return BadRequest("At least one status must be provided.");
             }
 
-            // Перевірка дат
-            if (filter.CreatedAfter.HasValue
-                && (filter.CreatedAfter.Value < new DateTime(1, 1, 1)
-                || filter.CreatedAfter.Value > DateTime.MaxValue))
-            {
-                return BadRequest("CreatedAfter date is out of range.");
-            }
-
-            if (filter.CreatedBefore.HasValue
-                && (filter.CreatedBefore.Value < new DateTime(1, 1, 1)
-                || filter.CreatedBefore.Value > DateTime.MaxValue))
-            {
-                return BadRequest("CreatedBefore date is out of range.");
-            }
-
             var query = _context.TrackedTasks.AsQueryable();
 
-            _logger.LogInformation($"Starting filtering with CreatedBefore: {filter.CreatedBefore}");
-
-            // Додати фільтрацію за статусом, якщо він переданий
             if (!string.IsNullOrEmpty(filter.Status))
             {
                 query = query.Where(t => t.Status == filter.Status);
             }
 
-            // Додати фільтрацію за пріоритетом
             if (!string.IsNullOrEmpty(filter.Priority))
             {
                 query = query.Where(t => t.Priority == filter.Priority);
             }
 
-            // Додати фільтрацію за користувачем
             if (filter.UserId.HasValue)
             {
                 query = query.Where(t => t.UserId == filter.UserId.Value);
             }
 
-            // Додати фільтрацію за статусами
             if (filter.Statuses != null && filter.Statuses.Any())
             {
                 query = query.Where(t => filter.Statuses.Contains(t.Status));
             }
 
-            // Додати фільтрацію за датами
             if (filter.CreatedAfter.HasValue)
             {
-                query = query.Where(t => t.CreatedAt >= ((DateTimeOffset)filter.CreatedAfter.Value).ToUnixTimeSeconds());
+                var createdAfterUnix = ((DateTimeOffset)filter.CreatedAfter.Value).ToUnixTimeSeconds();
+                query = query.Where(t => t.CreatedAt >= createdAfterUnix);
             }
 
             if (filter.CreatedBefore.HasValue)
@@ -109,24 +91,14 @@ namespace TaskTracker.Controllers
                 query = query.Where(t => t.CreatedAt <= createdBeforeUnix);
             }
 
-            // Обмежити результати, якщо задано
             if (filter.Limit.HasValue)
             {
                 query = query.Take(filter.Limit.Value);
             }
 
-            // Логіка для повернення порожнього списку
             var tasks = await query.ToListAsync();
 
-            if (tasks == null || !tasks.Any())
-            {
-                return new ActionResult<IEnumerable<TrackedTask>>(new List<TrackedTask>());
-            }
-
-            // Логування результатів
-            _logger.LogInformation($"Found {tasks.Count} tasks after filtering.");
-
-            return Ok(tasks);
+            return tasks.Any() ? Ok(tasks) : new ActionResult<IEnumerable<TrackedTask>>(new List<TrackedTask>());
         }
 
         [HttpPost]

@@ -47,6 +47,12 @@ namespace TaskTracker.DTO
                 tasks = tasks.Take(Limit.Value).ToList();
             }
 
+            if (CreatedAfter.HasValue)
+            {
+                var createdAfterUnix = ((DateTimeOffset)CreatedAfter.Value).ToUnixTimeSeconds();
+                tasks = tasks.Where(task => task.CreatedAt >= createdAfterUnix).ToList();
+            }
+
             if (CreatedBefore.HasValue)
             {
                 var createdBeforeUnix = ((DateTimeOffset)CreatedBefore.Value).ToUnixTimeSeconds();
