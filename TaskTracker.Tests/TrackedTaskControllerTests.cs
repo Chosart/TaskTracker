@@ -71,6 +71,7 @@ namespace TaskTracker.Tests
             var task1 = new TrackedTask
             {
                 Title = "Task 1",
+                Description = "Description for Task 1",
                 Status = "Open",
                 Priority = "High",
                 CreatedAt = 1234567890,
@@ -80,6 +81,7 @@ namespace TaskTracker.Tests
             var task2 = new TrackedTask
             {
                 Title = "Task 2",
+                Description = "Description for Task 2",
                 Status = "Closed",
                 Priority = "Medium",
                 CreatedAt = 1234567890,
@@ -98,7 +100,7 @@ namespace TaskTracker.Tests
             var tasks = Assert.IsType<List<TrackedTask>>(actionResult);
 
             Assert.Single(tasks);
-            Assert.Equal("Task 1", tasks[0].Title);
+            Assert.Equal("Task 1", tasks.First().Title);
         }
 
         [Fact]
