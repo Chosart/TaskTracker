@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TaskTracker.Migrations
 {
     /// <inheritdoc />
-    public partial class FixBugs : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -39,7 +39,8 @@ namespace TaskTracker.Migrations
                     Priority = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<int>(type: "int", nullable: false),
                     CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

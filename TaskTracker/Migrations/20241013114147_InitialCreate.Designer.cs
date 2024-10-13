@@ -12,8 +12,8 @@ using TaskTracker.Data;
 namespace TaskTracker.Migrations
 {
     [DbContext(typeof(TaskTrackerContext))]
-    [Migration("20241002171344_FixBugs")]
-    partial class FixBugs
+    [Migration("20241013114147_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,6 +47,10 @@ namespace TaskTracker.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
