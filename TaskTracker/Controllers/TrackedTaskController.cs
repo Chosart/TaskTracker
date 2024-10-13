@@ -120,6 +120,7 @@ namespace TaskTracker.Controllers
                 Description = taskDto.Description,
                 IsCompleted = taskDto.IsCompleted,
                 Priority = taskDto.Priority,
+                Status = taskDto.Status, // Переконайтеся, що статус тут присвоєний
                 CreatedAt = (int)(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
                 UserId = taskDto.UserId
             };

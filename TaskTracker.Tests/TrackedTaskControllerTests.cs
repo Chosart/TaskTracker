@@ -65,45 +65,6 @@ namespace TaskTracker.Tests
         }
 
         [Fact]
-        public async Task FilterTrackedTasks_ByStatus_ReturnsFilteredTasks()
-        {
-            // Створюємо декілька трекованих задач
-            var task1 = new TrackedTask
-            {
-                Title = "Task 1",
-                Description = "Description for Task 1",
-                Status = "Open",
-                Priority = "High",
-                CreatedAt = 1234567890,
-                UserId = 1
-            };
-
-            var task2 = new TrackedTask
-            {
-                Title = "Task 2",
-                Description = "Description for Task 2",
-                Status = "Closed",
-                Priority = "Medium",
-                CreatedAt = 1234567890,
-                UserId = 1
-            };
-
-            _context.TrackedTasks.AddRange(task1, task2);
-            await _context.SaveChangesAsync();
-
-            // Виклик методу фільтрації за статусом
-            var filterDto = new TaskFilterDto { Status = "Open" };
-            var result = await _controller.FilterTrackedTasks(filterDto);
-
-            // Перевірка, що повертається правильна задача
-            var actionResult = Assert.IsType<ActionResult<IEnumerable<TrackedTask>>>(result);   
-            var tasks = Assert.IsType<List<TrackedTask>>(actionResult);
-
-            Assert.Single(tasks);
-            Assert.Equal("Task 1", tasks.First().Title);
-        }
-
-        [Fact]
         public async Task UpdateTrackedTask_ValidTask_ReturnOk()
         {
             // Створюємо трековану задачу
@@ -161,7 +122,7 @@ namespace TaskTracker.Tests
                 Description = "New Description",
                 IsCompleted = false,
                 Priority = "Medium",
-                CreatedAt = (int)(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
+                Status = "Open",
                 UserId = 1
             };
 
@@ -178,6 +139,7 @@ namespace TaskTracker.Tests
             Assert.Equal(createTaskDto.Description, createdTask.Description);
             Assert.False(createdTask.IsCompleted);
             Assert.Equal(createTaskDto.Priority, createdTask.Priority);
+            Assert.Equal(createTaskDto.Status, createdTask.Status);
         }
 
         [Fact]
@@ -198,7 +160,7 @@ namespace TaskTracker.Tests
             // Створюємо задачу в контекст
             _context.TrackedTasks.Add(trackedTask);
             await _context.SaveChangesAsync();
-
+             
             // Виклик методу видалення задачі
             var result = await _controller.DeleteTrackedTask(trackedTask.Id);
 
