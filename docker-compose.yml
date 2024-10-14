@@ -5,12 +5,12 @@ services:
     image: ${DOCKER_REGISTRY-}tasktracker
     container_name: tasktracker.api
     build:
-      context: E:\TaskTrackerAPI\TaskTracker\TaskTracker
+      context: .
       dockerfile: Dockerfile
     ports:
-        - "5000:5000"
-        - "5001:5001"
-  
+      - "5000:5000"
+      - "5001:5001"
+
   tasktracker.database:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: tasktracker_database
@@ -19,6 +19,9 @@ services:
       - SA_PASSWORD=MyStrong!Passw0rd
       - MSSQL_DATABASE=TaskTrackerDb
     volumes:
-      - ./.containers/my_db:/var/opt/mssql
+      - my_db:/var/opt/mssql
     ports:
       - "1433:1433"
+
+volumes:
+  my_db:
