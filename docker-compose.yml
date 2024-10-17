@@ -15,8 +15,8 @@ services:
       - "5000:5000"
       - "5001:5001"
     volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:C:\Users\ContainerUser\AppData\Roaming\Microsoft\UserSecrets:ro
-      - ${APPDATA}/ASP.NET/Https:C:\Users\ContainerUser\AppData\Roaming\ASP.NET\Https:ro
+      - /mnt/c/Users/User/UserSecrets:/root/.microsoft/usersecrets
+      - /mnt/c/Users/User/Https:/root/.microsoft/https
 
   tasktracker.database:
     image: mcr.microsoft.com/mssql/server:2022-latest
