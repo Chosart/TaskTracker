@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskTracker.Data;
+using TaskTracker.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +45,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.    ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
