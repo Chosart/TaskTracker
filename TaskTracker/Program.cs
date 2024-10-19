@@ -8,6 +8,7 @@ using TaskTracker.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Налаштування аутентифікації
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -21,35 +22,39 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["AppSettings:Token"],
-        ValidAudience = builder.Configuration["AppSettings:Token"],
+        ValidIssuer = builder.Configuration["AppSettings:Issuer"],
+        ValidAudience = builder.Configuration["AppSettings:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]))
-
-
     };
 });
 
-// Add services to the container.
+// Додавання контексту бази даних
 builder.Services.AddDbContext<TaskTrackerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TaskTrackerContext")));
 
+// Додавання кешування Redis
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["Redis:Configuration"];
+    options.InstanceName = builder.Configuration["Redis:InstanceName"];
+});
+
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Налаштування конвеєра запитів
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.    ApplyMigrations();
+    app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication(); // Додано для аутентифікації
 app.UseAuthorization();
 
 app.MapControllers();
