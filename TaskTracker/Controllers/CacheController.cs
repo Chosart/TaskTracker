@@ -14,5 +14,12 @@ namespace TaskTracker.Controllers
         {
             _redisCacheService = redisCacheService;
         }
+
+        [HttpPost("set-cache")]
+        public async Task<IActionResult> SetCacheValue(string key, string value, int minutes)
+        {
+            await _redisCacheService.SetCacheValueAsync(key, value, TimeSpan.FromMinutes(minutes));
+            return Ok();
+        }
     }
 }
