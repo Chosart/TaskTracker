@@ -34,5 +34,12 @@ namespace TaskTracker.Controllers
 
             return Ok(value);
         }
+
+        [HttpDelete("remove-cache")]
+        public async Task<IActionResult> RemoveCacheValue(string key)
+        {
+            await _redisCacheService.RemoveCacheValueAsync(key);
+            return NoContent();
+        }
     }
 }
