@@ -5,6 +5,6 @@
         Task SetCacheValueAsync(string key, string value, TimeSpan? expiry = null);
         Task<string> GetCacheValueAsync(string key);
         Task RemoveCacheValueAsync(string key);
-        Task<bool> KeyExistAsync(string key);
+        Task<bool> KeyExistsAsync(string key);
     }
 }

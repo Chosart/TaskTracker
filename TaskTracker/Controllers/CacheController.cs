@@ -41,5 +41,12 @@ namespace TaskTracker.Controllers
             await _redisCacheService.RemoveCacheValueAsync(key);
             return NoContent();
         }
+
+        [HttpGet("exists-cache")]
+        public async Task<IActionResult> KeyExists(string key)
+        {
+            var exists = await _redisCacheService.KeyExistsAsync(key);
+            return Ok(exists);
+        }
     }
 }
