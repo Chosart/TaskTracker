@@ -21,5 +21,18 @@ namespace TaskTracker.Controllers
             await _redisCacheService.SetCacheValueAsync(key, value, TimeSpan.FromMinutes(minutes));
             return Ok();
         }
+
+        [HttpGet("get-cache")]
+        public async Task<IActionResult> GetCacheValue(string key)
+        {
+            var value = await _redisCacheService.GetCacheValueAsync(key);
+
+            if (value == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(value);
+        }
     }
 }
