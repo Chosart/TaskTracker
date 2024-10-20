@@ -3,7 +3,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace TaskTracker.Services
 {
-    public class RedisCacheService
+    public class RedisCacheService : IRedisCacheService
     {
         private readonly IDistributedCache _cache;
 

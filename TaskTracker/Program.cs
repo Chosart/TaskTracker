@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskTracker.Data;
 using TaskTracker.Extensions;
+using TaskTracker.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,8 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = builder.Configuration["Redis:Configuration"];
     options.InstanceName = builder.Configuration["Redis:InstanceName"];
 });
+
+builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
