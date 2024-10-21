@@ -16,9 +16,14 @@ namespace TaskTracker.Controllers
         }
 
         [HttpPost("set-cache")]
-        public async Task<IActionResult> SetCacheValue(string key, string value, int minutes)
+        public async Task<IActionResult> SetCacheValue([FromBody] CacheRequest request)
         {
-            await _redisCacheService.SetCacheValueAsync(key, value, TimeSpan.FromMinutes(minutes));
+            if (request == null || string.IsNullOrEmpty(request.Key) || string.IsNullOrEmpty(request.Value))
+            {
+                return BadRequest("Key and value are required.");
+            }
+
+            await _redisCacheService.SetCacheValueAsync(request.Key, request.Value, TimeSpan.FromMinutes(request.Minutes));
             return Ok();
         }
 
